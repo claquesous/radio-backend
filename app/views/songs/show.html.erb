@@ -1,0 +1,64 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Album:</strong>
+  <%= @song.album %>
+</p>
+
+<p>
+  <strong>Artist:</strong>
+  <%= @song.artist %>
+</p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @song.title %>
+</p>
+
+<p>
+  <strong>Sort:</strong>
+  <%= @song.sort %>
+</p>
+
+<p>
+  <strong>Slug:</strong>
+  <%= @song.slug %>
+</p>
+
+<p>
+  <strong>Track:</strong>
+  <%= @song.track %>
+</p>
+
+<p>
+  <strong>Time:</strong>
+  <%= @song.time %>
+</p>
+
+<p>
+  <strong>Featured:</strong>
+  <%= @song.featured %>
+</p>
+
+<p>
+  <strong>Live:</strong>
+  <%= @song.live %>
+</p>
+
+<p>
+  <strong>Remix:</strong>
+  <%= @song.remix %>
+</p>
+
+<p>
+  <strong>Rating:</strong>
+  <%= @song.rating %>
+</p>
+
+<p>
+  <strong>Path:</strong>
+  <%= @song.path %>
+</p>
+
+<%= link_to 'Edit', edit_song_path(@song) %> |
+<%= link_to 'Back', songs_path %>

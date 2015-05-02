@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Song:</strong>
+  <%= @play.song %>
+</p>
+
+<p>
+  <strong>Ratings:</strong>
+  <%= @play.ratings %>
+</p>
+
+<%= link_to 'Edit', edit_play_path(@play) %> |
+<%= link_to 'Back', plays_path %>
