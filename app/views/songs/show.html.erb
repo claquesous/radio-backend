@@ -2,12 +2,12 @@
 
 <p>
   <strong>Album:</strong>
-  <%= @song.album %>
+  <%= link_to @song.album.title, @song.album %>
 </p>
 
 <p>
   <strong>Artist:</strong>
-  <%= @song.artist %>
+  <%= link_to @song.artist.name, @song.artist %>
 </p>
 
 <p>

@@ -14,7 +14,7 @@
   <tbody>
     <% @plays.each do |play| %>
       <tr>
-        <td><%= play.song %></td>
+        <td><%= link_to play.song.title, play.song %></td>
         <td><%= play.ratings %></td>
         <td><%= link_to 'Show', play %></td>
         <td><%= link_to 'Edit', edit_play_path(play) %></td>

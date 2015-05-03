@@ -19,7 +19,7 @@
   <tbody>
     <% @albums.each do |album| %>
       <tr>
-        <td><%= album.artist %></td>
+        <td><%= link_to album.artist.name, album.artist %></td>
         <td><%= album.title %></td>
         <td><%= album.sort %></td>
         <td><%= album.slug %></td>
