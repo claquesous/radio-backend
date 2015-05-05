@@ -25,7 +25,7 @@ class PlaysController < ApplicationController
   # POST /plays
   # POST /plays.json
   def create
-    @play = Play.new(play_params)
+    @play = Play.next
 
     respond_to do |format|
       if @play.save
