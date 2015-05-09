@@ -2,7 +2,7 @@ class Play < ActiveRecord::Base
   belongs_to :song
   has_one :artist, through: :song
   default_scope {order(id: :desc)}
-  after_create :tweet_song
+  before_create :tweet_song
 
   def self.next
     song = pick_random_song until can_play?(song)
@@ -10,7 +10,8 @@ class Play < ActiveRecord::Base
   end
 
   def tweet_song
-    $twitter_client.update twitter_message
+    tweet = $twitter_client.update twitter_message
+    self.tweet_id = tweet.id
   end
 
   private
