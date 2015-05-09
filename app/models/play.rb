@@ -2,13 +2,22 @@ class Play < ActiveRecord::Base
   belongs_to :song
   has_one :artist, through: :song
   default_scope {order(id: :desc).limit(25)}
+  after_create :tweet_song
 
   def self.next
     song = pick_random_song until can_play?(song)
     song.plays.build(playtime: Time.now)
   end
 
+  def tweet_song
+    $twitter_client.update twitter_message
+  end
+
   private
+    def twitter_message
+      "Now playing: #{artist.name} - #{song.title}"
+    end
+
     def self.pick_random_song
       rating = Random.rand * 100
       songs = Song.where('rating > ?', rating).where(featured: true)

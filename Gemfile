@@ -46,3 +46,5 @@ group :development, :test do
 end
 
 gem 'unicorn'
+
+gem 'twitter'
