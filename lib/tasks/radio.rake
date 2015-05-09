@@ -1,3 +1,5 @@
+require 'mp3info'
+
 namespace :radio do
   def add_details
     artist = Artist.find_or_initialize_by(name: @artist) do |artist|
@@ -11,6 +13,7 @@ namespace :radio do
 
     /(?<tracknum>\d\d) (?<title>.*)\.mp3/ =~ @track
     song = album.songs.find_or_initialize_by(title: title) do |song|
+      song.time = Mp3Info.open(@path).length
       song.path = @path
       song.artist = artist
       song.track = tracknum
