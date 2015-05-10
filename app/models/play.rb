@@ -3,6 +3,7 @@ class Play < ActiveRecord::Base
   has_one :artist, through: :song
   default_scope {order(id: :desc)}
   before_create :tweet_song
+  after_create :send_to_live365
 
   def self.next
     song = pick_random_song until can_play?(song)
@@ -12,6 +13,10 @@ class Play < ActiveRecord::Base
   def tweet_song
     tweet = $twitter_client.update twitter_message
     self.tweet_id = tweet.id
+  end
+
+  def send_to_live365
+    Live365.send_metadata(song)
   end
 
   private

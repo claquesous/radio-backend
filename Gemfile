@@ -50,3 +50,5 @@ gem 'unicorn'
 gem 'twitter'
 
 gem 'ruby-mp3info'
+
+gem 'curb'
