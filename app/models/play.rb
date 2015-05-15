@@ -11,8 +11,12 @@ class Play < ActiveRecord::Base
   end
 
   def tweet_song
-    tweet = $twitter_client.update twitter_message
-    self.tweet_id = tweet.id
+    begin
+      tweet = $twitter_client.update twitter_message
+      self.tweet_id = tweet.id
+    rescue Twitter::Error
+      true
+    end
   end
 
   def send_to_live365
