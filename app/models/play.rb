@@ -20,7 +20,11 @@ class Play < ActiveRecord::Base
   end
 
   def send_to_live365
-    Live365.send_metadata(song)
+    begin
+      Live365.send_metadata(song)
+    rescue Curl::Err::HostResolutionError
+      true
+    end
   end
 
   private
