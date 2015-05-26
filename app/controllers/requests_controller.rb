@@ -1,5 +1,5 @@
 class RequestsController < ApplicationController
-  before_action :set_request, only: [:show, :edit, :update, :destroy]
+  before_action :set_request, only: [:show, :edit, :update]
 
   # GET /requests
   # GET /requests.json
@@ -48,16 +48,6 @@ class RequestsController < ApplicationController
         format.html { render :edit }
         format.json { render json: @request.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  # DELETE /requests/1
-  # DELETE /requests/1.json
-  def destroy
-    @request.destroy
-    respond_to do |format|
-      format.html { redirect_to requests_url, notice: 'Request was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 

@@ -1,5 +1,5 @@
 class RatingsController < ApplicationController
-  before_action :set_rating, only: [:show, :edit, :update, :destroy]
+  before_action :set_rating, only: [:show, :edit, :update]
 
   # GET /ratings
   # GET /ratings.json
@@ -48,16 +48,6 @@ class RatingsController < ApplicationController
         format.html { render :edit }
         format.json { render json: @rating.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  # DELETE /ratings/1
-  # DELETE /ratings/1.json
-  def destroy
-    @rating.destroy
-    respond_to do |format|
-      format.html { redirect_to ratings_url, notice: 'Rating was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 

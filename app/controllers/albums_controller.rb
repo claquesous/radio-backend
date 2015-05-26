@@ -1,5 +1,5 @@
 class AlbumsController < ApplicationController
-  before_action :set_album, only: [:show, :edit, :update, :destroy]
+  before_action :set_album, only: [:show, :edit, :update]
 
   # GET /albums
   # GET /albums.json
@@ -48,16 +48,6 @@ class AlbumsController < ApplicationController
         format.html { render :edit }
         format.json { render json: @album.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  # DELETE /albums/1
-  # DELETE /albums/1.json
-  def destroy
-    @album.destroy
-    respond_to do |format|
-      format.html { redirect_to albums_url, notice: 'Album was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 

@@ -1,5 +1,5 @@
 class PlaysController < ApplicationController
-  before_action :set_play, only: [:show, :edit, :update, :destroy]
+  before_action :set_play, only: [:show, :edit, :update]
   skip_before_filter :verify_authenticity_token, only: :create
 
   # GET /plays
@@ -49,16 +49,6 @@ class PlaysController < ApplicationController
         format.html { render :edit }
         format.json { render json: @play.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  # DELETE /plays/1
-  # DELETE /plays/1.json
-  def destroy
-    @play.destroy
-    respond_to do |format|
-      format.html { redirect_to plays_url, notice: 'Play was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 

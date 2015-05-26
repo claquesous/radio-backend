@@ -1,5 +1,5 @@
 class ArtistsController < ApplicationController
-  before_action :set_artist, only: [:show, :edit, :update, :destroy]
+  before_action :set_artist, only: [:show, :edit, :update]
 
   # GET /artists
   # GET /artists.json
@@ -48,16 +48,6 @@ class ArtistsController < ApplicationController
         format.html { render :edit }
         format.json { render json: @artist.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  # DELETE /artists/1
-  # DELETE /artists/1.json
-  def destroy
-    @artist.destroy
-    respond_to do |format|
-      format.html { redirect_to artists_url, notice: 'Artist was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 
