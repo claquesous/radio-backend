@@ -19,12 +19,8 @@
         <td><%= link_to play.artist.name, play.artist %></td>
         <td><%= play.ratings %></td>
         <td><%= link_to 'Show', play %></td>
-        <td><%= link_to 'Edit', edit_play_path(play) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
-<br>
-
-<%= link_to 'New Play', new_play_path %>

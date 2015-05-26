@@ -19,12 +19,8 @@
         <td><%= request.song %></td>
         <td><%= request.requested_at %></td>
         <td><%= link_to 'Show', request %></td>
-        <td><%= link_to 'Edit', edit_request_path(request) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
-<br>
-
-<%= link_to 'New Request', new_request_path %>
