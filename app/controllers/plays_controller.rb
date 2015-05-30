@@ -4,7 +4,8 @@ class PlaysController < ApplicationController
   # GET /plays
   # GET /plays.json
   def index
-    @plays = Play.limit(25)
+    limit = params[:limit] || 25
+    @plays = Play.limit(limit.to_i)
   end
 
   # GET /plays/1
