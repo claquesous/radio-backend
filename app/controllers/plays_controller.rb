@@ -22,7 +22,7 @@ class PlaysController < ApplicationController
     respond_to do |format|
       if @play.save
         format.html { redirect_to @play, notice: 'Play was successfully created.' }
-        format.json { render :show, status: :created, location: @play }
+        format.json { render :create, status: :created, location: @play }
       else
         format.html { render :new }
         format.json { render json: @play.errors, status: :unprocessable_entity }
