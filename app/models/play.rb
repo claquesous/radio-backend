@@ -2,8 +2,8 @@ class Play < ActiveRecord::Base
   belongs_to :song
   has_one :artist, through: :song
   default_scope {order(id: :desc)}
-  before_create :tweet_song
-  after_create :send_to_live365
+  before_create :tweet_song, if: "Rails.env.production?"
+  after_create :send_to_live365, if: "Rails.env.production?"
 
   def self.next
     song = pick_random_song until can_play?(song)
