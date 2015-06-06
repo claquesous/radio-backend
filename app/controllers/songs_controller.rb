@@ -4,7 +4,14 @@ class SongsController < ApplicationController
   # GET /songs
   # GET /songs.json
   def index
-    @songs = Song.all
+    limit = params[:limit] || 25
+    if params[:artist]
+      @songs = Artist.find(params[:artist]).songs.limit(limit.to_i)
+    elsif params[:album]
+      @songs = Album.find(params[:album]).songs.limit(limit.to_i)
+    else
+      @songs = Song.limit(limit.to_i)
+    end
   end
 
   # GET /songs/1
