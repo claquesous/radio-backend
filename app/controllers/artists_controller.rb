@@ -54,7 +54,7 @@ class ArtistsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_artist
-      @artist = Artist.find(params[:id])
+      @artist = Artist.includes(:songs).find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
