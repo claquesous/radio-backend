@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150509012859) do
+ActiveRecord::Schema.define(version: 20150622010401) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,6 +40,14 @@ ActiveRecord::Schema.define(version: 20150509012859) do
 
   add_index "artists", ["name"], name: "index_artists_on_name", unique: true, using: :btree
 
+  create_table "listeners", force: :cascade do |t|
+    t.string   "twitter_handle"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "listeners", ["twitter_handle"], name: "index_listeners_on_twitter_handle", using: :btree
+
   create_table "plays", force: :cascade do |t|
     t.integer  "song_id"
     t.integer  "ratings"
@@ -57,8 +65,10 @@ ActiveRecord::Schema.define(version: 20150509012859) do
     t.string   "twitter_handle"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.integer  "listener_id"
   end
 
+  add_index "ratings", ["listener_id"], name: "index_ratings_on_listener_id", using: :btree
   add_index "ratings", ["play_id"], name: "index_ratings_on_play_id", using: :btree
 
   create_table "requests", force: :cascade do |t|
@@ -68,8 +78,10 @@ ActiveRecord::Schema.define(version: 20150509012859) do
     t.boolean  "played"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.integer  "listener_id"
   end
 
+  add_index "requests", ["listener_id"], name: "index_requests_on_listener_id", using: :btree
   add_index "requests", ["song_id"], name: "index_requests_on_song_id", using: :btree
 
   create_table "songs", force: :cascade do |t|
@@ -95,7 +107,9 @@ ActiveRecord::Schema.define(version: 20150509012859) do
 
   add_foreign_key "albums", "artists"
   add_foreign_key "plays", "songs"
+  add_foreign_key "ratings", "listeners"
   add_foreign_key "ratings", "plays"
+  add_foreign_key "requests", "listeners"
   add_foreign_key "requests", "songs"
   add_foreign_key "songs", "albums"
   add_foreign_key "songs", "artists"

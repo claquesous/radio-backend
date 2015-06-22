@@ -1,0 +1,22 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Listeners</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Twitter handle</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @listeners.each do |listener| %>
+      <tr>
+        <td><%= listener.twitter_handle %></td>
+        <td><%= link_to 'Show', listener %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
