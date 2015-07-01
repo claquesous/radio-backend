@@ -24,7 +24,7 @@
   <tbody>
     <% @songs.each do |song| %>
       <tr>
-        <td><%= link_to song.album.title, song.album %></td>
+        <td><%= link_to song.album.title, song.album if song.album %></td>
         <td><%= link_to song.artist.name, song.artist %></td>
         <td><%= song.title %></td>
         <td><%= song.sort %></td>

@@ -2,7 +2,7 @@
 
 <p>
   <strong>Album:</strong>
-  <%= link_to @song.album.title, @song.album %>
+  <%= link_to @song.album.title, @song.album if @song.album %>
 </p>
 
 <p>
