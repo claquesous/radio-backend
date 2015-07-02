@@ -17,7 +17,7 @@
       <tr>
         <td><%= link_to play.song.title, play.song %></td>
         <td><%= link_to play.artist.name, play.artist %></td>
-        <td><%= play.ratings %></td>
+        <td><%= play.ratings.count %></td>
         <td><%= link_to 'Show', play %></td>
       </tr>
     <% end %>
