@@ -11,7 +11,9 @@ class Live365
     }
     args[:album] = song.album.title if song.album
 
-    Curl.post("http://www.live365.com/cgi-bin/add_song.cgi", args)
+    Curl.post("http://www.live365.com/cgi-bin/add_song.cgi", args) do |curl|
+      curl.timeout = 3 # No need to wait for a response
+    end
   end
 
 end
