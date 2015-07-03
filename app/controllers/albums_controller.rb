@@ -4,7 +4,11 @@ class AlbumsController < ApplicationController
   # GET /albums
   # GET /albums.json
   def index
-    @albums = Album.all
+    if params[:query]
+      @albums = Album.where("title ilike ?", "%#{params[:query]}%")
+    else
+      @albums = Album.all
+    end
   end
 
   # GET /albums/1

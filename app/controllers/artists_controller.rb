@@ -4,7 +4,11 @@ class ArtistsController < ApplicationController
   # GET /artists
   # GET /artists.json
   def index
-    @artists = Artist.all
+    if params[:query]
+      @artists = Artist.where("name ilike ?", "%#{params[:query]}%")
+    else
+      @artists = Artist.all
+    end
   end
 
   # GET /artists/1
