@@ -29,6 +29,28 @@ class Play < ActiveRecord::Base
     end
   end
 
+  def self.by_date(from = nil, to = nil)
+    songs = unscoped
+    songs = songs.where('playtime > ?', from) if from
+    songs = songs.where('playtime < ?', to) if to
+    songs
+  end
+
+  def self.song_ranks(from = nil, to = nil)
+    songs = by_date(from, to)
+    counts = songs.group(:song_id).order('count_song_id desc').count(:song_id)
+  end
+
+  def self.artist_ranks(from = nil, to = nil)
+    songs = by_date(from, to).joins(:song)
+    counts = songs.group(:artist_id).order('count_artist_id desc').count(:artist_id)
+  end
+
+  def self.album_ranks(from = nil, to = nil)
+    songs = by_date(from, to).joins(:song).where('songs.album_id is not null')
+    counts = songs.group(:album_id).order('count_album_id desc').count(:album_id)
+  end
+
   private
     def twitter_message
       "Now playing: #{artist.name} - #{song.title}"
