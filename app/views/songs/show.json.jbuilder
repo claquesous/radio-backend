@@ -1,4 +1,4 @@
-json.extract! @song, :id, :album, :artist_id, :title, :sort, :slug, :track, :time, :featured, :live, :remix, :rating, :created_at, :updated_at
+json.extract! @song, :id, :album, :artist, :title, :sort, :slug, :track, :time, :featured, :live, :remix, :rating, :created_at, :updated_at
 json.play_count @song.plays.count
 json.last_played_at @song.plays.first.try(:playtime)
 json.previous_played_at @song.plays.second.try(:playtime)
