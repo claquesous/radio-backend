@@ -1,6 +1,7 @@
 class Play < ActiveRecord::Base
   belongs_to :song
   has_one :artist, through: :song
+  has_one :album, through: :song
   has_many :ratings
   default_scope {order(id: :desc)}
   before_create :tweet_song, if: "Rails.env.production?"
