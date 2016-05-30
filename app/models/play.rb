@@ -16,7 +16,7 @@ class Play < ActiveRecord::Base
       process_replies
       tweet = $twitter_client.update twitter_message
       self.tweet_id = tweet.id
-    rescue Twitter::Error
+    rescue Twitter::Error, Zlib::DataError
       true
     end
   end
