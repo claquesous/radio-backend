@@ -5,7 +5,6 @@ class Play < ActiveRecord::Base
   has_many :ratings
   default_scope {order(id: :desc)}
   before_create :tweet_song, if: "Rails.env.production?"
-  after_create :send_to_live365, if: "Rails.env.production?"
 
   def self.next
     song = pick_random_song
@@ -18,14 +17,6 @@ class Play < ActiveRecord::Base
       tweet = $twitter_client.update twitter_message
       self.tweet_id = tweet.id
     rescue Twitter::Error
-      true
-    end
-  end
-
-  def send_to_live365
-    begin
-      Live365.send_metadata(song)
-    rescue Curl::Err::HostResolutionError, Curl::Err::ConnectionFailedError, Curl::Err::TimeoutError
       true
     end
   end
