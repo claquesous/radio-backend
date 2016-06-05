@@ -5,6 +5,7 @@ class Play < ActiveRecord::Base
   has_many :ratings
   default_scope {order(id: :desc)}
   before_create :tweet_song, if: "Rails.env.production?"
+  after_destroy :delete_tweet, if: "Rails.env.production?"
 
   def self.next
     song = pick_random_song
@@ -17,6 +18,14 @@ class Play < ActiveRecord::Base
       tweet = $twitter_client.update twitter_message
       self.tweet_id = tweet.id
     rescue Twitter::Error, Zlib::DataError
+      true
+    end
+  end
+
+  def delete_tweet
+    begin
+      $twitter_client.destroy_status tweet_id
+    rescue Twitter::Error
       true
     end
   end
