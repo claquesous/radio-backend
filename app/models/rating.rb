@@ -1,4 +1,4 @@
-class Rating < ActiveRecord::Base
+class Rating < ApplicationRecord
   belongs_to :play
   belongs_to :listener
   has_one :song, through: :play

@@ -1,4 +1,4 @@
-class Artist < ActiveRecord::Base
+class Artist < ApplicationRecord
   default_scope { order :sort }
   has_many :songs
   has_many :albums

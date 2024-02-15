@@ -1,11 +1,11 @@
-class Play < ActiveRecord::Base
+class Play < ApplicationRecord
   belongs_to :song
   has_one :artist, through: :song
   has_one :album, through: :song
   has_many :ratings
   default_scope {order(id: :desc)}
-  before_create :tweet_song, if: "Rails.env.production?"
-  after_destroy :delete_tweet, if: "Rails.env.production?"
+  before_create :tweet_song, :if => proc { Rails.env.production? }
+  after_destroy :delete_tweet, :if => proc { Rails.env.production? }
 
   def self.next
     song = pick_random_song
