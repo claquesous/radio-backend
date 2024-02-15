@@ -4,30 +4,10 @@ class Play < ApplicationRecord
   has_one :album, through: :song
   has_many :ratings
   default_scope {order(id: :desc)}
-  before_create :tweet_song, :if => proc { Rails.env.production? }
-  after_destroy :delete_tweet, :if => proc { Rails.env.production? }
 
   def self.next
     song = pick_random_song
     song.plays.build(playtime: Time.now)
-  end
-
-  def tweet_song
-    begin
-      process_replies
-      tweet = $twitter_client.update twitter_message
-      self.tweet_id = tweet.id
-    rescue Twitter::Error, Zlib::DataError
-      true
-    end
-  end
-
-  def delete_tweet
-    begin
-      $twitter_client.destroy_status tweet_id
-    rescue Twitter::Error
-      true
-    end
   end
 
   def self.by_date(from = nil, to = nil)
@@ -53,10 +33,6 @@ class Play < ApplicationRecord
   end
 
   private
-    def twitter_message
-      "Now playing: #{artist.name} - #{song.title}"
-    end
-
     def self.pick_song_by_rating(rating)
       songs = Song.where('rating > ?', rating).where(featured: true).to_a
       return if songs.empty?
@@ -80,29 +56,4 @@ class Play < ApplicationRecord
       true
     end
 
-    def rate_up(tweet)
-      text = "@#{$twitter_client.user.screen_name} I love this song!"
-      if tweet.full_text == text
-        listener = Listener.find_or_create_by(twitter_handle: tweet.user.screen_name)
-        Play.first.ratings.create(listener: listener, up: true)
-      end
-    end
-
-    def rate_down(tweet)
-      text = "@#{$twitter_client.user.screen_name} I hate this song!"
-      if tweet.full_text == text
-        listener = Listener.find_or_create_by(twitter_handle: tweet.user.screen_name)
-        Play.first.ratings.create(listener: listener, up: false)
-      end
-    end
-
-    def process_replies
-      tweet_id = Play.first.tweet_id
-      $twitter_client.mentions_timeline(since_id: tweet_id).each do |tweet|
-        if tweet.in_reply_to_status_id == tweet_id.to_i
-          rate_up tweet
-          rate_down tweet
-        end
-      end if tweet_id
-    end
 end
