@@ -1,5 +1,5 @@
 class Song < ApplicationRecord
-  belongs_to :album
+  belongs_to :album, optional: true
   belongs_to :artist
   has_many :plays
   default_scope { order(rating: :desc).where(featured: true) }

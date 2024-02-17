@@ -5,7 +5,7 @@ namespace :radio do
     artist = Artist.find_or_initialize_by(name: name) do |artist|
       artist.sort = name.sub(/^The /, '')
     end
-    artist.save and puts "Ingest Artist: #{name}" unless artist.persisted?
+    artist.save! and puts "Ingest Artist: #{name}" unless artist.persisted?
     artist
   end
 
@@ -13,7 +13,7 @@ namespace :radio do
     album = artist.albums.find_or_initialize_by(title: title) do |album|
       album.sort = title.sub(/^The /, '')
     end
-    album.save and puts "Ingest Album: #{title}" unless album.persisted?
+    album.save! and puts "Ingest Album: #{title}" unless album.persisted?
     album
   end
 
@@ -30,7 +30,7 @@ namespace :radio do
       song.rating = 85
       song.sort = song_title.sub(/^The /, '')
     end
-    song.save and puts "Ingest Song: #{song_title}" unless song.persisted?
+    song.save! and puts "Ingest Song: #{song_title}" unless song.persisted?
   end
 
 
