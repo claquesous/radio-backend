@@ -4,10 +4,20 @@ class Play < ApplicationRecord
   has_one :album, through: :song
   has_many :ratings
   default_scope {order(id: :desc)}
+  before_create :toot_song, :if => proc { Rails.env.production? }
 
   def self.next
     song = pick_random_song
     song.plays.build(playtime: Time.now)
+  end
+
+  def toot_song
+    begin
+      toot = $mastodon_client.create_status(mastodon_message)
+      self.tweet_id = toot.id
+    rescue FrozenError
+      true
+    end
   end
 
   def self.by_date(from = nil, to = nil)
@@ -33,6 +43,10 @@ class Play < ApplicationRecord
   end
 
   private
+    def mastodon_message
+      "Now playing: #{artist.name} - #{song.title}"
+    end
+
     def self.pick_song_by_rating(rating)
       songs = Song.where('rating > ?', rating).where(featured: true).to_a
       return if songs.empty?
