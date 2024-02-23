@@ -1,6 +1,6 @@
 class Rating < ApplicationRecord
   belongs_to :play
-  belongs_to :listener
+  belongs_to :listener, optional: true
   has_one :song, through: :play
   before_create :update_rating
 
