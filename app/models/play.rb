@@ -13,9 +13,9 @@ class Play < ApplicationRecord
 
   def toot_song
     begin
-      toot = $mastodon_client.create_status(mastodon_message)
+      toot = $mastodon_client.create_status(mastodon_message, visibility: 'unlisted')
       self.tweet_id = toot.id
-    rescue FrozenError
+    rescue FrozenError, HTTP::TimeoutError
       true
     end
   end
