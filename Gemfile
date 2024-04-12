@@ -64,3 +64,5 @@ gem 'ruby-mp3info'
 
 gem 'aws-sdk-s3', '~> 1.146', '>= 1.146.1'
 
+gem 'sorcery'
+
