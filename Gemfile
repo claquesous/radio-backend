@@ -62,3 +62,5 @@ gem 'mastodon-api', require: 'mastodon'
 
 gem 'ruby-mp3info'
 
+gem 'aws-sdk-s3', '~> 1.146', '>= 1.146.1'
+
