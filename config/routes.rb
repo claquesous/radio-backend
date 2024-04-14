@@ -1,15 +1,19 @@
 Rails.application.routes.draw do
-  get "logout" => "sessions#destroy", :as => "logout"
-  get "login" => "sessions#new", :as => "login"
-  get "signup" => "users#new", :as => "signup"
-  resources :users
-  resources :sessions
+  scope :admin do
+    get "logout" => "sessions#destroy", :as => "logout"
+    get "login" => "sessions#new", :as => "login"
+    get "signup" => "users#new", :as => "signup"
+    resources :users
+    resources :sessions
 
-  resources :listeners, :requests, :ratings, only: [:index, :show]
-  resources :plays, only: [:index, :create, :show]
-  resources :songs, :albums, :artists, except: :destroy
+    resources :listeners, :requests, :ratings, only: [:index, :show]
+    resources :plays, only: [:index, :show]
+    resources :songs, :albums, :artists, except: :destroy
 
-  scope :public, defaults: {format: :json} do
+    root 'plays#index'
+  end
+
+  scope :api, defaults: {format: :json} do
     constraints format: :json do
       resources :listeners, :requests, :ratings, only: [:index, :show]
       resources :plays, only: [:index, :show]
@@ -17,5 +21,7 @@ Rails.application.routes.draw do
     end
   end
 
-  root 'plays#index'
+  scope :private do
+    resources :plays, only: [:create]
+  end
 end
