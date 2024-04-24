@@ -15,4 +15,12 @@ class SessionsController < ApplicationController
     logout
     redirect_to root_url, :notice => "Logged out!"
   end
+
+  def logged_in
+    if current_user
+      head :ok
+    else
+      head :unauthorized
+    end
+  end
 end

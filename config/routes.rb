@@ -23,5 +23,7 @@ Rails.application.routes.draw do
 
   scope :private do
     resources :plays, only: [:create]
+
+    get "auth", to: "sessions#logged_in"
   end
 end
