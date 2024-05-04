@@ -45,5 +45,15 @@ FactoryBot.define do
     twitter_handle { "TwitterHandle" }
   end
 
+  factory :user do
+    sequence(:email) { |n| "user#{n}@example.org" }
+    password { "passw0rd" }
+  end
+
+  factory :stream do
+    user
+    name { "MyStream" }
+  end
+
 end
 

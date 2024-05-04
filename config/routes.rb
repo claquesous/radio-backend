@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     get "signup" => "users#new", :as => "signup"
     resources :users
     resources :sessions
+    resources :streams
 
     resources :listeners, :requests, :ratings, only: [:index, :show]
     resources :plays, only: [:index, :show]
@@ -18,6 +19,7 @@ Rails.application.routes.draw do
       resources :listeners, :requests, :ratings, only: [:index, :show]
       resources :plays, only: [:index, :show]
       resources :songs, :albums, :artists, only: [:index, :show]
+      resources :streams, only: [:index, :show]
     end
   end
 
