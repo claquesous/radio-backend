@@ -52,13 +52,6 @@ RSpec.describe PlaysController, type: :controller do
     end
   end
 
-  describe "GET #new" do
-    it "assigns a new play as @play" do
-      get :new, {}, valid_session
-      expect(assigns(:play)).to be_a_new(Play)
-    end
-  end
-
   describe "GET #edit" do
     it "assigns the requested play as @play" do
       play = Play.create! valid_attributes

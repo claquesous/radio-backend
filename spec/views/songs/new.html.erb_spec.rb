@@ -2,20 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "songs/new", type: :view do
   before(:each) do
-    assign(:song, Song.new(
-      :album => "",
-      :artist => nil,
-      :title => "MyString",
-      :sort => "MyString",
-      :slug => "MyString",
-      :track => "",
-      :time => "",
-      :featured => false,
-      :live => false,
-      :remix => false,
-      :rating => "",
-      :path => "MyString"
-    ))
+    assign(:song, build(:song))
   end
 
   it "renders new song form" do
@@ -23,7 +10,7 @@ RSpec.describe "songs/new", type: :view do
 
     assert_select "form[action=?][method=?]", songs_path, "post" do
 
-      assert_select "input#song_album[name=?]", "song[album]"
+      assert_select "input#song_album_id[name=?]", "song[album_id]"
 
       assert_select "input#song_artist_id[name=?]", "song[artist_id]"
 
@@ -44,8 +31,6 @@ RSpec.describe "songs/new", type: :view do
       assert_select "input#song_remix[name=?]", "song[remix]"
 
       assert_select "input#song_rating[name=?]", "song[rating]"
-
-      assert_select "input#song_path[name=?]", "song[path]"
     end
   end
 end

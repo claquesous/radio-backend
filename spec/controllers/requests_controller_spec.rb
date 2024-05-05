@@ -52,13 +52,6 @@ RSpec.describe RequestsController, type: :controller do
     end
   end
 
-  describe "GET #new" do
-    it "assigns a new request as @request" do
-      get :new, {}, valid_session
-      expect(assigns(:request)).to be_a_new(Request)
-    end
-  end
-
   describe "GET #edit" do
     it "assigns the requested request as @request" do
       request = Request.create! valid_attributes

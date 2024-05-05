@@ -2,15 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "albums/edit", type: :view do
   before(:each) do
-    @album = assign(:album, Album.create!(
-      :artist => nil,
-      :title => "MyString",
-      :sort => "MyString",
-      :slug => "MyString",
-      :tracks => "",
-      :id3_genre => "MyString",
-      :record_label => "MyString"
-    ))
+    @album = assign(:album, create(:album))
   end
 
   it "renders the edit album form" do

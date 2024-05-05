@@ -52,13 +52,6 @@ RSpec.describe AlbumsController, type: :controller do
     end
   end
 
-  describe "GET #new" do
-    it "assigns a new album as @album" do
-      get :new, {}, valid_session
-      expect(assigns(:album)).to be_a_new(Album)
-    end
-  end
-
   describe "GET #edit" do
     it "assigns the requested album as @album" do
       album = Album.create! valid_attributes

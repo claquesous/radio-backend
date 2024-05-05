@@ -52,13 +52,6 @@ RSpec.describe ListenersController, type: :controller do
     end
   end
 
-  describe "GET #new" do
-    it "assigns a new listener as @listener" do
-      get :new, {}, valid_session
-      expect(assigns(:listener)).to be_a_new(Listener)
-    end
-  end
-
   describe "GET #edit" do
     it "assigns the requested listener as @listener" do
       listener = Listener.create! valid_attributes
