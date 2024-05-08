@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - gem install bundler
+      - bundle install
+  build:
+    commands:
+      - bundle exec rake build
+  post_build:
+    commands:
+      - bundle exec rake deploy
