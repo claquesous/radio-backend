@@ -9,7 +9,7 @@ phases:
       - gem install bundler -v 2.3.26
       - bundle install --deployment
       - yarn install
-      - tar czvf radio-backend.tgz --exclude-vcs --exclude=spec --exclude=tmp --exclude=log *
+      - tar czf radio-backend.tgz --exclude-vcs --exclude=spec --exclude=tmp --exclude=log *
 artifacts:
   files:
     - 'radio-backend.tgz'
