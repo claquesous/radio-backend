@@ -9,6 +9,7 @@ phases:
       - gem install bundler -v 2.3.26
       - bundle install --deployment
       - yarn install
+      - RAILS_ENV=production bundle exec rails assets:precompile
       - tar czf radio-backend.tgz --exclude-vcs --exclude=spec --exclude=tmp --exclude=log *
 artifacts:
   files:
