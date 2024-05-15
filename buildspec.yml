@@ -8,8 +8,11 @@ phases:
     commands:
       - gem install bundler -v 2.3.26
       - bundle install --deployment
-      - yarn install
+  build:
+    commands:
       - SECRET_KEY_BASE=`./bin/rails secret` RAILS_ENV=production bundle exec rails assets:precompile
+  post_build:
+    commands:
       - tar czf radio-backend.tgz --exclude-vcs --exclude=spec --exclude=tmp --exclude=log *
 artifacts:
   files:
