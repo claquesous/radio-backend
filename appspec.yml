@@ -10,18 +10,18 @@ permissions:
     group: ubuntu
 hooks:
   ApplicationStop:
-    - location: /usr/bin/systemctl stop claqradio-backend.service
+    - location: scripts/deploy_stop.sh
       runas: root
   BeforeInstall:
-    - location: /home/ubuntu/.asdf/shims/ruby scripts/deploy_setup.rb
+    - location: scripts/deploy_setup.rb
       runas: ubuntu
   AfterInstall:
     - location: scripts/deploy_migrate.sh
       runas: ubuntu
   ApplicationStart:
-    - location: /usr/bin/systemctl start claqradio-backend.service
+    - location: scripts/deploy_start.sh
       runas: root
   ValidateService:
-    - location: /usr/bin/systemctl status claqradio-backend.service
+    - location: scripts/deploy_status.sh
       runas: ubuntu
 
