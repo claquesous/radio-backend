@@ -20,11 +20,9 @@ end.reverse
 keep_dirs = dirs.first(KEEP_RELEASES).map { |dir| File.join(RELEASES_DIR, dir) }
 keep_dirs << current_dir
 
-keep_dirs_set = keep_dirs.to_set
-
 dirs.each do |dir|
   full_path = File.join(RELEASES_DIR, dir)
-  unless keep_dirs_set.include?(full_path)
+  unless keep_dirs.include?(full_path)
     FileUtils.rm_rf(full_path)
     puts "Deleted directory: #{full_path}"
   end
