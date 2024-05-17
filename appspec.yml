@@ -1,0 +1,27 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /opt/claqradio/radio-backend/current
+permissions:
+  - object: /opt/claqradio/radio-backend/current
+    pattern: “**”
+    owner: ubuntu
+    group: ubuntu
+hooks:
+  ApplicationStop:
+    - location: /usr/bin/systemctl stop claqradio-backend.service
+      runas: root
+  BeforeInstall:
+    - location: scripts/deploy_setup.sh
+      runas: ubuntu
+  AfterInstall:
+    - location: scripts/deploy_migrate.sh
+      runas: ubuntu
+  ApplicationStart:
+    - location: /usr/bin/systemctl start claqradio-backend.service
+      runas: root
+  ValidateService:
+    - location: /usr/bin/systemctl status claqradio-backend.service
+      runas: ubuntu
+
