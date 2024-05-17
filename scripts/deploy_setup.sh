@@ -1,5 +1,5 @@
 #!/bin/bash
 
-/home/ubuntu/.asdf/bin/asdf exec bundle exec rake deploy:cleanup_releases
-/home/ubuntu/.asdf/bin/asdf exec bundle exec rake deploy:create_new_release
+/home/ubuntu/.asdf/bin/asdf exec ./bin/rake deploy:cleanup_releases
+/home/ubuntu/.asdf/bin/asdf exec ./bin/rake deploy:create_new_release
 
