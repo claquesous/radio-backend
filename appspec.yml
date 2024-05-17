@@ -13,7 +13,7 @@ hooks:
     - location: /usr/bin/systemctl stop claqradio-backend.service
       runas: root
   BeforeInstall:
-    - location: ruby scripts/deploy_setup.rb
+    - location: /home/ubuntu/.asdf/shims/ruby scripts/deploy_setup.rb
       runas: ubuntu
   AfterInstall:
     - location: scripts/deploy_migrate.sh
