@@ -1,4 +1,4 @@
 #!/bin/bash
 
-/home/ubuntu/.asdf/bin/asdf exec ./bin/rails db:migrate
+/home/ubuntu/.asdf/bin/asdf exec bundle exec rails db:migrate
 
