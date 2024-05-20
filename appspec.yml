@@ -2,26 +2,14 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /opt/claqradio/radio-backend/current
+    destination: /opt/claqradio/radio-backend/next
 permissions:
-  - object: /opt/claqradio/radio-backend/current
+  - object: /opt/claqradio/radio-backend/next
     pattern: “**”
     owner: ubuntu
     group: ubuntu
 hooks:
-  ApplicationStop:
-    - location: scripts/deploy_stop.sh
-      runas: root
   BeforeInstall:
     - location: scripts/deploy_setup.rb
-      runas: ubuntu
-  AfterInstall:
-    - location: scripts/deploy_migrate.sh
-      runas: ubuntu
-  ApplicationStart:
-    - location: scripts/deploy_start.sh
-      runas: root
-  ValidateService:
-    - location: scripts/deploy_status.sh
       runas: ubuntu
 
