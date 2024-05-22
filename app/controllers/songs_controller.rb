@@ -38,14 +38,15 @@ class SongsController < ApplicationController
     mp3_info = Mp3Info.new(uploaded_file.tempfile.path)
 
     artist_name = mp3_info.tag.artist
-    artist = Artist.find_or_initialize_by(name: artist_name)
+    @artist = Artist.find_or_initialize_by(name: artist_name)
 
-    if artist.new_record?
+    if @artist.new_record?
       # Artist doesn't exist, prompt the user to create a new one
-      render :new_artist, locals: { artist: artist }, notice: "Artist does not exist!"
+      @artist.sort = @artist.name.sub(/^The /, '')
+      render "artists/new", locals: { artist: @artist }, notice: "Artist does not exist!"
     else
       # Artist exists, create the song and associate it with the artist
-      @song = artist.songs.build
+      @song = @artist.songs.build
       @song.from_mp3_info(mp3_info)
       upload_to_s3(uploaded_file)
 
