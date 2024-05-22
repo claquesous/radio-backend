@@ -1,3 +1,5 @@
+require 'mp3info'
+
 class SongsController < ApplicationController
   before_action :set_song, only: [:show, :edit, :update]
 
@@ -31,17 +33,26 @@ class SongsController < ApplicationController
   end
 
   # POST /songs
-  # POST /songs.json
   def create
-    @song = Song.new(song_params)
+    uploaded_file = params[:song][:file]
+    mp3_info = Mp3Info.new(uploaded_file.tempfile.path)
 
-    respond_to do |format|
+    artist_name = mp3_info.tag.artist
+    artist = Artist.find_or_initialize_by(name: artist_name)
+
+    if artist.new_record?
+      # Artist doesn't exist, prompt the user to create a new one
+      render :new_artist, locals: { artist: artist }, notice: "Artist does not exist!"
+    else
+      # Artist exists, create the song and associate it with the artist
+      @song = artist.songs.build
+      @song.from_mp3_info(mp3_info)
+      upload_to_s3(uploaded_file)
+
       if @song.save
-        format.html { redirect_to @song, notice: 'Song was successfully created.' }
-        format.json { render :show, status: :created, location: @song }
+        redirect_to @song, notice: 'Song was successfully created.'
       else
-        format.html { render :new }
-        format.json { render json: @song.errors, status: :unprocessable_entity }
+        render :new
       end
     end
   end
@@ -69,5 +80,12 @@ class SongsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def song_params
       params.require(:song).permit(:album, :artist_id, :title, :sort, :slug, :track, :time, :featured, :live, :remix, :rating, :path)
+    end
+
+    def upload_to_s3(file)
+      s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
+      obj = s3.bucket(ENV['AWS_S3_BUCKET']).object(@song.s3_path)
+
+      obj.upload_file(file.tempfile.path)
     end
 end
