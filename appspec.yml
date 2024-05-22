@@ -1,0 +1,15 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /opt/claqradio/radio-backend/next
+permissions:
+  - object: /opt/claqradio/radio-backend/next
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+hooks:
+  BeforeInstall:
+    - location: scripts/deploy_setup.rb
+      runas: ubuntu
+
