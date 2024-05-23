@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_22_185558) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_23_185832) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -93,6 +93,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_22_185558) do
     t.datetime "updated_at", precision: nil, null: false
     t.integer "year"
     t.index ["album_id"], name: "index_songs_on_album_id"
+    t.index ["artist_id", "title"], name: "index_songs_on_artist_id_and_title", unique: true
     t.index ["artist_id"], name: "index_songs_on_artist_id"
     t.index ["rating", "featured"], name: "index_songs_on_rating_and_featured"
   end
