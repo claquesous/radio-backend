@@ -4,7 +4,8 @@ class Song < ApplicationRecord
   belongs_to :album, optional: true
   belongs_to :artist
   has_many :plays
-  has_many :choosers
+  has_many :choosers, dependent: :destroy
+  before_create :add_choosers
   default_scope { order(rating: :desc).where(featured: true) }
 
   def rank(from = nil, to = nil)
@@ -24,6 +25,12 @@ class Song < ApplicationRecord
     self.featured = true
     self.rating = 85
     self.sort = title.sub(/^The /, '')
+  end
+
+  def add_choosers
+    Stream.all.each do |stream|
+      choosers.build(stream: stream, rating: rating, featured: featured)
+    end
   end
 end
 

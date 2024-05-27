@@ -6,9 +6,8 @@
   <% @choosers.each do |chooser| %>
     <%= render chooser %>
     <p>
-      <%= link_to "Show this chooser", chooser %>
+      <%= link_to "Show this chooser", [chooser.stream, chooser] %>
     </p>
   <% end %>
 </div>
 
-<%= link_to "New chooser", new_chooser_path %>

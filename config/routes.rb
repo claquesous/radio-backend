@@ -1,12 +1,13 @@
 Rails.application.routes.draw do
-  resources :choosers
   scope :admin do
     get "logout" => "sessions#destroy", :as => "logout"
     get "login" => "sessions#new", :as => "login"
     get "signup" => "users#new", :as => "signup"
     resources :users
     resources :sessions
-    resources :streams
+    resources :streams do
+      resources :choosers, except: [:new, :create, :destroy]
+    end
 
     resources :listeners, :requests, :ratings, only: [:index, :show]
     resources :plays, only: [:index, :show]
