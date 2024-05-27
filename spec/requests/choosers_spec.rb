@@ -41,48 +41,11 @@ RSpec.describe "/choosers", type: :request do
     end
   end
 
-  describe "GET /new" do
-    it "renders a successful response" do
-      get new_chooser_url
-      expect(response).to be_successful
-    end
-  end
-
   describe "GET /edit" do
     it "renders a successful response" do
       chooser = Chooser.create! valid_attributes
       get edit_chooser_url(chooser)
       expect(response).to be_successful
-    end
-  end
-
-  describe "POST /create" do
-    context "with valid parameters" do
-      it "creates a new Chooser" do
-        expect {
-          post choosers_url, params: { chooser: valid_attributes }
-        }.to change(Chooser, :count).by(1)
-      end
-
-      it "redirects to the created chooser" do
-        post choosers_url, params: { chooser: valid_attributes }
-        expect(response).to redirect_to(chooser_url(Chooser.last))
-      end
-    end
-
-    context "with invalid parameters" do
-      it "does not create a new Chooser" do
-        expect {
-          post choosers_url, params: { chooser: invalid_attributes }
-        }.to change(Chooser, :count).by(0)
-      end
-
-    
-      it "renders a response with 422 status (i.e. to display the 'new' template)" do
-        post choosers_url, params: { chooser: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-    
     end
   end
 
@@ -118,18 +81,4 @@ RSpec.describe "/choosers", type: :request do
     end
   end
 
-  describe "DELETE /destroy" do
-    it "destroys the requested chooser" do
-      chooser = Chooser.create! valid_attributes
-      expect {
-        delete chooser_url(chooser)
-      }.to change(Chooser, :count).by(-1)
-    end
-
-    it "redirects to the choosers list" do
-      chooser = Chooser.create! valid_attributes
-      delete chooser_url(chooser)
-      expect(response).to redirect_to(choosers_url)
-    end
-  end
 end

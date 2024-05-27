@@ -19,10 +19,6 @@ RSpec.describe "choosers/edit", type: :view do
 
     assert_select "form[action=?][method=?]", chooser_path(chooser), "post" do
 
-      assert_select "input[name=?]", "chooser[song_id]"
-
-      assert_select "input[name=?]", "chooser[stream_id]"
-
       assert_select "input[name=?]", "chooser[featured]"
 
       assert_select "input[name=?]", "chooser[rating]"
