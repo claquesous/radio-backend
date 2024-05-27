@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_23_185832) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_27_025859) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -34,6 +34,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_23_185832) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["name"], name: "index_artists_on_name", unique: true
+  end
+
+  create_table "choosers", force: :cascade do |t|
+    t.bigint "song_id", null: false
+    t.bigint "stream_id", null: false
+    t.boolean "featured"
+    t.float "rating"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["song_id"], name: "index_choosers_on_song_id"
+    t.index ["stream_id", "rating"], name: "index_choosers_on_stream_id_and_rating", where: "(featured = true)"
+    t.index ["stream_id"], name: "index_choosers_on_stream_id"
   end
 
   create_table "listeners", id: :serial, force: :cascade do |t|
@@ -118,6 +130,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_23_185832) do
   end
 
   add_foreign_key "albums", "artists"
+  add_foreign_key "choosers", "songs"
+  add_foreign_key "choosers", "streams"
   add_foreign_key "plays", "songs"
   add_foreign_key "ratings", "listeners"
   add_foreign_key "ratings", "plays"

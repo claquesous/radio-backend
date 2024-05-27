@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :choosers
   scope :admin do
     get "logout" => "sessions#destroy", :as => "logout"
     get "login" => "sessions#new", :as => "login"

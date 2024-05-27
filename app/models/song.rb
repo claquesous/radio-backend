@@ -4,6 +4,7 @@ class Song < ApplicationRecord
   belongs_to :album, optional: true
   belongs_to :artist
   has_many :plays
+  has_many :choosers
   default_scope { order(rating: :desc).where(featured: true) }
 
   def rank(from = nil, to = nil)
