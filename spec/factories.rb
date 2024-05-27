@@ -1,4 +1,5 @@
 FactoryBot.define do
+
   factory :artist do
     sequence(:name) { |n| "Artist Name #{n}" }
     sort { "Artist Name" }
