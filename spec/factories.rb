@@ -1,12 +1,4 @@
 FactoryBot.define do
-  factory :chooser do
-    song { nil }
-    stream { nil }
-    featured { false }
-    rating { 1.5 }
-  end
-
-
   factory :artist do
     sequence(:name) { |n| "Artist Name #{n}" }
     sort { "Artist Name" }
@@ -60,6 +52,13 @@ FactoryBot.define do
   factory :stream do
     user
     name { "MyStream" }
+  end
+
+  factory :chooser do
+    stream
+    song
+    rating { 50 }
+    featured { true }
   end
 
 end

@@ -2,12 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "choosers/edit", type: :view do
   let(:chooser) {
-    Chooser.create!(
-      song: nil,
-      stream: nil,
-      featured: false,
-      rating: 1.5
-    )
+    create(:chooser)
   }
 
   before(:each) do
@@ -17,7 +12,7 @@ RSpec.describe "choosers/edit", type: :view do
   it "renders the edit chooser form" do
     render
 
-    assert_select "form[action=?][method=?]", chooser_path(chooser), "post" do
+    assert_select "form[action=?][method=?]", stream_chooser_path(chooser.stream, chooser), "post" do
 
       assert_select "input[name=?]", "chooser[featured]"
 
