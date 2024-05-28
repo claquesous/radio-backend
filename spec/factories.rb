@@ -26,6 +26,7 @@ FactoryBot.define do
   end
 
   factory :play do
+    stream
     song
   end
 
@@ -34,6 +35,7 @@ FactoryBot.define do
   end
 
   factory :request do
+    stream
     song
     listener
     twitter_handle { "TwitterHandle" }

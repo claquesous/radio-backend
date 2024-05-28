@@ -1,4 +1,5 @@
 class Play < ApplicationRecord
+  belongs_to :stream
   belongs_to :song
   has_one :artist, through: :song
   has_one :album, through: :song

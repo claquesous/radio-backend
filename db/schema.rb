@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_27_025859) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_27_181944) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -62,7 +62,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_025859) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.string "tweet_id"
+    t.bigint "stream_id"
     t.index ["song_id"], name: "index_plays_on_song_id"
+    t.index ["stream_id"], name: "index_plays_on_stream_id"
   end
 
   create_table "ratings", id: :serial, force: :cascade do |t|
@@ -84,8 +86,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_025859) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.integer "listener_id"
+    t.bigint "stream_id"
     t.index ["listener_id"], name: "index_requests_on_listener_id"
     t.index ["song_id"], name: "index_requests_on_song_id"
+    t.index ["stream_id"], name: "index_requests_on_stream_id"
   end
 
   create_table "songs", id: :serial, force: :cascade do |t|
@@ -133,10 +137,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_025859) do
   add_foreign_key "choosers", "songs"
   add_foreign_key "choosers", "streams"
   add_foreign_key "plays", "songs"
+  add_foreign_key "plays", "streams"
   add_foreign_key "ratings", "listeners"
   add_foreign_key "ratings", "plays"
   add_foreign_key "requests", "listeners"
   add_foreign_key "requests", "songs"
+  add_foreign_key "requests", "streams"
   add_foreign_key "songs", "albums"
   add_foreign_key "songs", "artists"
 end
