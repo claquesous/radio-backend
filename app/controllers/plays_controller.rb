@@ -1,4 +1,5 @@
 class PlaysController < ApplicationController
+  before_action :set_stream
   skip_before_action :verify_authenticity_token, only: :create
 
   # GET /plays
@@ -17,7 +18,7 @@ class PlaysController < ApplicationController
   # POST /plays
   # POST /plays.json
   def create
-    @play = Play.next
+    @play = @stream.next
 
     respond_to do |format|
       if @play.save
@@ -29,4 +30,10 @@ class PlaysController < ApplicationController
       end
     end
   end
+
+  private
+
+    def set_stream
+      @stream = Stream.find(params[:stream_id] || 1)
+    end
 end

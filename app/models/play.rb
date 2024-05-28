@@ -7,11 +7,6 @@ class Play < ApplicationRecord
   default_scope {order(id: :desc)}
   before_create :toot_song, :if => proc { Rails.env.production? }
 
-  def self.next
-    song = pick_random_song
-    song.plays.build(playtime: Time.now)
-  end
-
   def toot_song
     begin
       toot = $mastodon_client.create_status(mastodon_message, visibility: 'unlisted')
@@ -46,29 +41,6 @@ class Play < ApplicationRecord
   private
     def mastodon_message
       "Now playing: #{artist.name} - #{song.title}"
-    end
-
-    def self.pick_song_by_rating(rating)
-      songs = Song.where('rating > ?', rating).where(featured: true).to_a
-      return if songs.empty?
-      begin
-        candidate = songs.delete_at(Random.rand(songs.count))
-        song = candidate if can_play?(candidate)
-      end until song || songs.empty?
-      song
-    end
-
-    def self.pick_random_song
-      song = pick_song_by_rating(Random.rand * 100) until song
-      song
-    end
-
-    def self.can_play?(song)
-      return false unless song
-      limit(80).includes(:song, :artist).each_with_index do |play, i|
-        return false if play.song == song || (i<40 && play.artist == song.artist)
-      end
-      true
     end
 
 end
