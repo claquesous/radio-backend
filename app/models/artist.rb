@@ -8,4 +8,9 @@ class Artist < ApplicationRecord
     rank = Play.artist_ranks(from,to).keys.index(id)
     rank + 1 if rank
   end
+
+  def stream_rank(stream, from = nil, to = nil)
+    rank = stream.artist_ranks(from,to).keys.index(id)
+    rank + 1 if rank
+  end
 end

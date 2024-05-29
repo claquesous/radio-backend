@@ -2,14 +2,14 @@ require 'rails_helper'
 
 RSpec.describe "plays/index", type: :view do
   before(:each) do
-    assign(:plays, [
-      create(:play),
-      create(:play),
-    ])
+    @play1 = create(:play)
+    @play2 = create(:play)
+    assign(:plays, [ @play1, @play2 ])
   end
 
   it "renders a list of plays" do
     render
-    assert_select "tr>td", :text => "Song Title".to_s, :count => 2
+    assert_select "tr>td", :text => @play1.song.title
+    assert_select "tr>td", :text => @play2.song.title
   end
 end

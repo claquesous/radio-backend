@@ -15,4 +15,4 @@
   <%= @request.requested_at %>
 </p>
 
-<%= link_to 'Back', requests_path %>
+<%= link_to 'Back', stream_requests_path(@request.stream) %>

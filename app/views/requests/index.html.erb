@@ -18,7 +18,7 @@
         <td><%= request.twitter_handle %></td>
         <td><%= request.song %></td>
         <td><%= request.requested_at %></td>
-        <td><%= link_to 'Show', request %></td>
+        <td><%= link_to 'Show', stream_request_path(request.stream, request) %></td>
       </tr>
     <% end %>
   </tbody>

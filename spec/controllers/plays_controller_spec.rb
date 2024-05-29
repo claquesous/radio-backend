@@ -61,10 +61,12 @@ RSpec.describe PlaysController, type: :controller do
   end
 
   describe "POST #create" do
+    let(:stream) { create(:stream) }
     context "with valid params" do
       it "creates a new Play" do
+        create(:song)
         expect {
-          post :create, {:play => valid_attributes}, valid_session
+          post :create, params: { stream_id: stream.id, format: :json }
         }.to change(Play, :count).by(1)
       end
 

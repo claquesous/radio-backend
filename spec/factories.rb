@@ -16,7 +16,7 @@ FactoryBot.define do
   factory :song do
     album
     artist
-    title { "Song Title" } 
+    sequence(:title) { |n| "Song Title #{n}" }
     sort { "Song Title" }
     slug { "song-title" }
     time { 180 }
@@ -26,6 +26,7 @@ FactoryBot.define do
   end
 
   factory :play do
+    stream
     song
   end
 
@@ -34,6 +35,7 @@ FactoryBot.define do
   end
 
   factory :request do
+    stream
     song
     listener
     twitter_handle { "TwitterHandle" }
@@ -53,6 +55,13 @@ FactoryBot.define do
   factory :stream do
     user
     name { "MyStream" }
+  end
+
+  factory :chooser do
+    stream
+    song
+    rating { 50 }
+    featured { true }
   end
 
 end

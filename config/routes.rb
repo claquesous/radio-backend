@@ -5,9 +5,13 @@ Rails.application.routes.draw do
     get "signup" => "users#new", :as => "signup"
     resources :users
     resources :sessions
-    resources :streams
+    resources :streams do
+      resources :choosers, except: [:new, :create, :destroy]
+      resources :requests, only: [:index, :show]
+      resources :plays, only: [:index, :show]
+    end
 
-    resources :listeners, :requests, :ratings, only: [:index, :show]
+    resources :listeners, :ratings, only: [:index, :show]
     resources :plays, only: [:index, :show]
     resources :songs, :albums, :artists, except: :destroy
 
@@ -16,14 +20,18 @@ Rails.application.routes.draw do
 
   scope :api, defaults: {format: :json} do
     constraints format: :json do
-      resources :listeners, :requests, :ratings, only: [:index, :show]
+      resources :listeners, :ratings, only: [:index, :show]
       resources :plays, only: [:index, :show]
       resources :songs, :albums, :artists, only: [:index, :show]
-      resources :streams, only: [:index, :show]
+      resources :streams, only: [:index, :show] do
+        resources :songs, only: :show, module: :streams
+        resources :artists, only: :show, module: :streams
+      end
     end
   end
 
   scope :private do
+    post "streams/:stream_id/plays", to: "plays#create"
     resources :plays, only: [:create]
 
     get "auth", to: "sessions#logged_in"
