@@ -19,7 +19,7 @@ class ChoosersController < ApplicationController
   def update
     respond_to do |format|
       if @chooser.update(chooser_params)
-        format.html { redirect_to chooser_url(@chooser), notice: "Chooser was successfully updated." }
+        format.html { redirect_to stream_chooser_url(@stream, @chooser), notice: "Chooser was successfully updated." }
         format.json { render :show, status: :ok, location: @chooser }
       else
         format.html { render :edit, status: :unprocessable_entity }
