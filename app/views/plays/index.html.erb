@@ -7,6 +7,7 @@
     <tr>
       <th>Song</th>
       <th>Artist</th>
+      <th>Stream</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -16,6 +17,7 @@
       <tr>
         <td><%= link_to play.song.title, play.song %></td>
         <td><%= link_to play.artist.name, play.artist %></td>
+        <td><%= link_to play.stream.name, play.stream %></td>
         <td><%= link_to 'Show', play %></td>
       </tr>
     <% end %>

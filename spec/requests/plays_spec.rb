@@ -1,11 +1,20 @@
 require 'rails_helper'
 
-RSpec.describe "Plays", type: :request do
-  describe "GET /plays" do
-    it "works! (now write some real specs)" do
-      stream = create(:stream)
-      get stream_plays_path(stream)
-      expect(response).to have_http_status(200)
+RSpec.describe "/plays", type: :request do
+
+  describe "GET /index" do
+    it "renders a successful response" do
+      play = create(:play)
+      get stream_plays_url(play.stream)
+      expect(response).to be_successful
+    end
+  end
+
+  describe "GET /show" do
+    it "renders a successful response" do
+      play = create(:play)
+      get stream_play_url(play.stream, play)
+      expect(response).to be_successful
     end
   end
 end
