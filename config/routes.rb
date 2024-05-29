@@ -23,7 +23,10 @@ Rails.application.routes.draw do
       resources :listeners, :ratings, only: [:index, :show]
       resources :plays, only: [:index, :show]
       resources :songs, :albums, :artists, only: [:index, :show]
-      resources :streams, only: [:index, :show]
+      resources :streams, only: [:index, :show] do
+        resources :songs, only: :show, module: :streams
+        resources :artists, only: :show, module: :streams
+      end
     end
   end
 

@@ -13,6 +13,11 @@ class Song < ApplicationRecord
     rank + 1 if rank
   end
 
+  def stream_rank(stream, from = nil, to = nil)
+    rank = stream.song_ranks(from,to).keys.index(id)
+    rank + 1 if rank
+  end
+
   def s3_path
     "#{to_slug artist.name}/#{to_slug album.try(:title) || 'singles'}/#{to_slug title}"
   end

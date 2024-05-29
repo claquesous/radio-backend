@@ -15,6 +15,28 @@ class Stream < ApplicationRecord
     plays.build(playtime: Time.now, song: pick_random_song)
   end
 
+  def by_date(from = nil, to = nil)
+    plays = self.plays.unscoped
+    plays = plays.where('playtime > ?', from) if from
+    plays = plays.where('playtime < ?', to) if to
+    plays
+  end
+
+  def song_ranks(from = nil, to = nil)
+    plays = by_date(from, to)
+    plays.group(:song_id).order('count_song_id desc').count(:song_id)
+  end
+
+  def artist_ranks(from = nil, to = nil)
+    plays = by_date(from, to).joins(:song)
+    plays.group(:artist_id).order('count_artist_id desc').count(:artist_id)
+  end
+
+  def album_ranks(from = nil, to = nil)
+    plays = by_date(from, to).joins(:song).where('songs.album_id is not null')
+    plays.group(:album_id).order('count_album_id desc').count(:album_id)
+  end
+
   private
 
     def pick_song_by_rating(rating)
