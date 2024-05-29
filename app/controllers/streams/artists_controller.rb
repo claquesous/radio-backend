@@ -1,5 +1,5 @@
 module Streams
-  class SongsController < ApplicationController
+  class ArtistsController < ApplicationController
     # GET /streams/1/artists/1.json
     def show
       stream = Stream.find(params[:stream_id])
