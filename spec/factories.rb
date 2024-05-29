@@ -16,7 +16,7 @@ FactoryBot.define do
   factory :song do
     album
     artist
-    title { "Song Title" } 
+    sequence(:title) { |n| "Song Title #{n}" }
     sort { "Song Title" }
     slug { "song-title" }
     time { 180 }

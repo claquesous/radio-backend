@@ -11,7 +11,7 @@ class Stream < ApplicationRecord
     end
   end
 
-  def next
+  def next_play
     plays.build(playtime: Time.now, song: pick_random_song)
   end
 
@@ -19,12 +19,10 @@ class Stream < ApplicationRecord
 
     def pick_song_by_rating(rating)
       options = choosers.where(featured: true).where('rating > ?', rating).to_a
-      return if options.empty?
-      begin
+      until options.empty?
         candidate = options.delete_at(Random.rand(options.count)).song
-        song = candidate if can_play?(candidate)
-      end until song || options.empty?
-      song
+        return candidate if can_play?(candidate)
+      end
     end
 
     def pick_random_song
@@ -34,7 +32,7 @@ class Stream < ApplicationRecord
 
     def can_play?(song)
       return false unless song
-      plays.limit(80).includes(:song, :artist).find_each.with_index do |play, i|
+      plays.limit(80).includes(:song, :artist).each_with_index do |play, i|
         return false if play.song == song || (i<40 && play.artist == song.artist)
       end
       true

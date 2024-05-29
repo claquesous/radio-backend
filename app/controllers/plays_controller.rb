@@ -18,7 +18,7 @@ class PlaysController < ApplicationController
   # POST /plays
   # POST /plays.json
   def create
-    @play = @stream.next
+    @play = @stream.next_play
 
     respond_to do |format|
       if @play.save
