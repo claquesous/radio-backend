@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       resources :streams, only: [:index, :show] do
         resources :songs, only: :show, module: :streams
         resources :artists, only: :show, module: :streams
+        resources :plays, only: [:index, :show]
       end
     end
   end
