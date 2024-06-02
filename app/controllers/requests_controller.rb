@@ -1,4 +1,5 @@
 class RequestsController < ApplicationController
+  before_action :set_stream
   # GET /requests
   # GET /requests.json
   def index
@@ -10,4 +11,10 @@ class RequestsController < ApplicationController
   def show
     @request = Request.find(params[:id])
   end
+
+  private
+
+    def set_stream
+      @stream = Stream.find(params[:stream_id] || 1)
+    end
 end

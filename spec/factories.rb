@@ -34,14 +34,12 @@ FactoryBot.define do
     stream
     song
     user
-    twitter_handle { "TwitterHandle" }
   end
 
   factory :rating do
     play
     up { true }
     user
-    twitter_handle { "TwitterHandle" }
   end
 
   factory :user do

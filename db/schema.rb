@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_02_185922) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_02_194046) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -61,9 +61,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_02_185922) do
   end
 
   create_table "ratings", id: :serial, force: :cascade do |t|
-    t.integer "play_id"
+    t.integer "play_id", null: false
     t.boolean "up"
-    t.string "twitter_handle"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.bigint "user_id", null: false
@@ -72,7 +71,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_02_185922) do
   end
 
   create_table "requests", id: :serial, force: :cascade do |t|
-    t.string "twitter_handle"
     t.integer "song_id"
     t.datetime "requested_at", precision: nil
     t.boolean "played"
