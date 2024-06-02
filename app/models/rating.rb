@@ -5,9 +5,11 @@ class Rating < ApplicationRecord
   before_create :update_rating
 
   def update_rating
-    old = song.rating
-    diff = (100*old-(old*old))/500;
-    song.rating = song.rating.send( up ? :+ : :-, diff)
-    song.save!
+    chooser = play.stream.choosers.where(song: song).first
+    old = chooser.rating
+    diff = (100*old-(old*old))/500
+    chooser.rating = chooser.rating.send( up ? :+ : :-, diff)
+    chooser.save!
   end
 end
+
