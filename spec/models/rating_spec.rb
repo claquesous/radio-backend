@@ -1,6 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Rating, type: :model do
+  describe "#validates_latest" do
+    it "doesn't allow ratings for earlier plays" do
+      earlier = create(:play)
+      create(:play, stream: earlier.stream)
+      expect(build(:rating, play: earlier)).to_not be_valid
+    end
+  end
+
   describe "#update_rating" do
     let (:play) { create(:play) }
 
