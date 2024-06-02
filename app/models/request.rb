@@ -1,5 +1,5 @@
 class Request < ApplicationRecord
   belongs_to :stream
   belongs_to :song
-  belongs_to :listener
+  belongs_to :user
 end

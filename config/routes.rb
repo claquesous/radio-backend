@@ -8,10 +8,10 @@ Rails.application.routes.draw do
     resources :streams do
       resources :choosers, except: [:new, :create, :destroy]
       resources :requests, only: [:index, :show]
+      resources :ratings, only: [:index, :show]
       resources :plays, only: [:index, :show]
     end
 
-    resources :listeners, :ratings, only: [:index, :show]
     resources :plays, only: [:index, :show]
     resources :songs, :albums, :artists, except: :destroy
 
@@ -20,13 +20,13 @@ Rails.application.routes.draw do
 
   scope :api, defaults: {format: :json} do
     constraints format: :json do
-      resources :listeners, :ratings, only: [:index, :show]
       resources :plays, only: [:index, :show]
       resources :songs, :albums, :artists, only: [:index, :show]
       resources :streams, only: [:index, :show] do
         resources :songs, only: :show, module: :streams
         resources :artists, only: :show, module: :streams
         resources :plays, only: [:index, :show]
+        resources :ratings, only: [:index, :show]
       end
     end
   end

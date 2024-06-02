@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_27_181944) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_02_185922) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -48,13 +48,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_181944) do
     t.index ["stream_id"], name: "index_choosers_on_stream_id"
   end
 
-  create_table "listeners", id: :serial, force: :cascade do |t|
-    t.string "twitter_handle"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.index ["twitter_handle"], name: "index_listeners_on_twitter_handle"
-  end
-
   create_table "plays", id: :serial, force: :cascade do |t|
     t.integer "song_id"
     t.integer "ratings"
@@ -73,9 +66,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_181944) do
     t.string "twitter_handle"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.integer "listener_id"
-    t.index ["listener_id"], name: "index_ratings_on_listener_id"
+    t.bigint "user_id", null: false
     t.index ["play_id"], name: "index_ratings_on_play_id"
+    t.index ["user_id"], name: "index_ratings_on_user_id"
   end
 
   create_table "requests", id: :serial, force: :cascade do |t|
@@ -85,11 +78,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_181944) do
     t.boolean "played"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.integer "listener_id"
     t.bigint "stream_id"
-    t.index ["listener_id"], name: "index_requests_on_listener_id"
+    t.bigint "user_id", null: false
     t.index ["song_id"], name: "index_requests_on_song_id"
     t.index ["stream_id"], name: "index_requests_on_stream_id"
+    t.index ["user_id"], name: "index_requests_on_user_id"
   end
 
   create_table "songs", id: :serial, force: :cascade do |t|
@@ -138,11 +131,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_181944) do
   add_foreign_key "choosers", "streams"
   add_foreign_key "plays", "songs"
   add_foreign_key "plays", "streams"
-  add_foreign_key "ratings", "listeners"
   add_foreign_key "ratings", "plays"
-  add_foreign_key "requests", "listeners"
+  add_foreign_key "ratings", "users"
   add_foreign_key "requests", "songs"
   add_foreign_key "requests", "streams"
+  add_foreign_key "requests", "users"
   add_foreign_key "songs", "albums"
   add_foreign_key "songs", "artists"
 end
