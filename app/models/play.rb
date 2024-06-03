@@ -10,7 +10,7 @@ class Play < ApplicationRecord
 
   def toot_song
     begin
-      client = if stream.mastodon_access_token
+      client = if stream.mastodon_access_token.present? && stream.mastodon_url.present?
         Mastodon::REST::Client.new(base_url: stream.mastodon_url, bearer_token: stream.mastodon_access_token)
       else
         Mastodon::REST::Client.new(base_url: ENV['MASTODON_URL'], bearer_token: ENV['MASTODON_ACCESS_TOKEN'])
