@@ -72,3 +72,5 @@ gem 'sorcery'
 
 gem 'pundit'
 
+gem 'attr_encrypted', '~> 4.1.0'
+

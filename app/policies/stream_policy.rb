@@ -3,6 +3,18 @@ class StreamPolicy < ApplicationPolicy
     record.user == user
   end
 
+  def edit?
+    record.user == user
+  end
+
+  def update?
+    record.user == user
+  end
+
+  def destroy?
+    record.user == user
+  end
+
   class Scope
     def initialize(user, scope)
       @user = user

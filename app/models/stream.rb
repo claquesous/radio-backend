@@ -5,6 +5,8 @@ class Stream < ApplicationRecord
   has_many :requests
   before_create :add_choosers
 
+  attr_encrypted :mastodon_access_token, key: ENV['MASTODON_ACCESS_TOKEN_KEY']
+
   def add_choosers
     Song.all.each do |song|
       choosers.build(song: song, rating: song.rating, featured: song.featured)
