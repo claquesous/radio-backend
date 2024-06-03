@@ -22,6 +22,16 @@
   </div>
 
   <div>
+    <%= form.label :mastodon_url, style: "display: block" %>
+    <%= form.text_field :mastodon_url %>
+  </div>
+
+  <div>
+    <%= form.label :mastodon_access_token, style: "display: block" %>
+    <%= form.password_field :mastodon_access_token %>
+  </div>
+
+  <div>
     <%= form.submit %>
   </div>
 <% end %>

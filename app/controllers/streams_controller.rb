@@ -18,6 +18,7 @@ class StreamsController < ApplicationController
 
   # GET /streams/1/edit
   def edit
+    authorize @stream
   end
 
   # POST /streams or /streams.json
@@ -37,6 +38,7 @@ class StreamsController < ApplicationController
 
   # PATCH/PUT /streams/1 or /streams/1.json
   def update
+    authorize @stream
     respond_to do |format|
       if @stream.update(stream_params)
         format.html { redirect_to stream_url(@stream), notice: "Stream was successfully updated." }
@@ -50,6 +52,7 @@ class StreamsController < ApplicationController
 
   # DELETE /streams/1 or /streams/1.json
   def destroy
+    authorize @stream
     @stream.destroy!
 
     respond_to do |format|
@@ -66,6 +69,6 @@ class StreamsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def stream_params
-      params.require(:stream).permit(:name, :user_id)
+      params.require(:stream).permit(:name, :user_id, :mastodon_url, :mastodon_access_token)
     end
 end
