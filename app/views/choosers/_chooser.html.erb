@@ -1,7 +1,7 @@
 <div id="<%= dom_id chooser %>">
   <p>
     <strong>Song:</strong>
-    <%= chooser.song_id %>
+    <%= link_to chooser.song.title, chooser.song %>
   </p>
 
   <p>
@@ -13,5 +13,12 @@
     <strong>Rating:</strong>
     <%= chooser.rating %>
   </p>
+
+  <%= form_for(:request, url: stream_requests_path(@stream)) do |f| %>
+    <p class="actions">
+      <%= f.hidden_field :song_id, value: chooser.song.id %>
+      <%= f.submit "Request" %>
+    </p>
+  <% end %>
 
 </div>

@@ -4,7 +4,7 @@ class ChoosersController < ApplicationController
 
   # GET /choosers or /choosers.json
   def index
-    @choosers = @stream.choosers
+    @choosers = @stream.choosers.includes(:song)
   end
 
   # GET /choosers/1 or /choosers/1.json
@@ -19,7 +19,7 @@ class ChoosersController < ApplicationController
   def update
     respond_to do |format|
       if @chooser.update(chooser_params)
-        format.html { redirect_to chooser_url(@chooser), notice: "Chooser was successfully updated." }
+        format.html { redirect_to stream_chooser_url(@stream, @chooser), notice: "Chooser was successfully updated." }
         format.json { render :show, status: :ok, location: @chooser }
       else
         format.html { render :edit, status: :unprocessable_entity }

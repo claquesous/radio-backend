@@ -4,6 +4,14 @@ RSpec.describe Stream, type: :model do
   let(:stream) { create(:stream) }
 
   describe "#next_play" do
+    it "returns eligible requests first" do
+      request = create(:request, stream: stream)
+      stream.choosers = create_list(:chooser, 5) do |chooser, i|
+        chooser.rating = 99
+      end
+      expect(stream.next_play.song.id).to equal(request.song.id)
+    end
+
     it "returns songs with high ratings" do
       song = create(:song)
       stream.choosers = create_list(:chooser, 5) do |chooser, i|

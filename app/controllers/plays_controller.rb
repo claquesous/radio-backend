@@ -6,7 +6,7 @@ class PlaysController < ApplicationController
   # GET /plays.json
   def index
     limit = (params[:limit] || 25).to_i
-    @plays = Play.includes(:artist, :song, :album).limit(limit)
+    @plays = @stream.plays.includes(:artist, :song, :album).limit(limit)
   end
 
   # GET /plays/1

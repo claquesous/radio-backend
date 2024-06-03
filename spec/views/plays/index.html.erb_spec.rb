@@ -3,8 +3,9 @@ require 'rails_helper'
 RSpec.describe "plays/index", type: :view do
   before(:each) do
     @play1 = create(:play)
-    @play2 = create(:play)
+    @play2 = create(:play, stream: @play1.stream)
     assign(:plays, [ @play1, @play2 ])
+    assign(:stream, @play1.stream)
   end
 
   it "renders a list of plays" do

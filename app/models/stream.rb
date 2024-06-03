@@ -12,7 +12,7 @@ class Stream < ApplicationRecord
   end
 
   def next_play
-    plays.build(playtime: Time.now, song: pick_random_song)
+    plays.build(playtime: Time.now, song: pick_requested_song || pick_random_song)
   end
 
   def by_date(from = nil, to = nil)
@@ -45,6 +45,12 @@ class Stream < ApplicationRecord
         candidate = options.delete_at(Random.rand(options.count)).song
         return candidate if can_play?(candidate)
       end
+    end
+
+    def pick_requested_song
+      requests.eligible_to_play.detect do |request|
+        can_play?(request.song)
+      end&.song
     end
 
     def pick_random_song

@@ -1,3 +1,3 @@
 json.array!(@requests) do |request|
-  json.extract! request, :id, :twitter_handle, :song, :requested_at
+  json.extract! request, :id, :song, :user_id, :requested_at
 end

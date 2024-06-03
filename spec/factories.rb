@@ -30,21 +30,18 @@ FactoryBot.define do
     song
   end
 
-  factory :listener do
-    twitter_handle { "TwitterHandle" }
-  end
-
   factory :request do
     stream
     song
-    listener
-    twitter_handle { "TwitterHandle" }
+    user
+    requested_at { 2.hours.ago }
+    played { false }
   end
 
   factory :rating do
     play
     up { true }
-    twitter_handle { "TwitterHandle" }
+    user
   end
 
   factory :user do

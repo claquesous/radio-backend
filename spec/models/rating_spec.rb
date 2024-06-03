@@ -1,5 +1,47 @@
 require 'rails_helper'
 
 RSpec.describe Rating, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe "#validates_latest" do
+    it "doesn't allow ratings for earlier plays" do
+      earlier = create(:play)
+      create(:play, stream: earlier.stream)
+      expect(build(:rating, play: earlier)).to_not be_valid
+    end
+  end
+
+  describe "#update_rating" do
+    let (:play) { create(:play) }
+
+    context "up" do
+      it "upgrades middling songs a lot" do
+        chooser = play.stream.choosers.where(song: play.song).first
+        chooser.update!(rating: 50)
+        create(:rating, play: play, up: true)
+        expect(chooser.reload.rating).to be(55.0)
+      end
+
+      it "barely upgrades high rated songs" do
+        chooser = play.stream.choosers.where(song: play.song).first
+        chooser.update!(rating: 99)
+        create(:rating, play: play, up: true)
+        expect(chooser.reload.rating).to be(99.198)
+      end
+    end
+
+    context "down" do
+      it "upgrades middling songs a lot" do
+        chooser = play.stream.choosers.where(song: play.song).first
+        chooser.update!(rating: 50)
+        create(:rating, play: play, up: false)
+        expect(chooser.reload.rating).to be(45.0)
+      end
+
+      it "barely upgrades low rated songs" do
+        chooser = play.stream.choosers.where(song: play.song).first
+        chooser.update!(rating: 1)
+        create(:rating, play: play, up: false)
+        expect(chooser.reload.rating).to be(0.802)
+      end
+    end
+  end
 end
