@@ -34,6 +34,8 @@ FactoryBot.define do
     stream
     song
     user
+    requested_at { 2.hours.ago }
+    played { false }
   end
 
   factory :rating do

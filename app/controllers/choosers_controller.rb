@@ -4,7 +4,7 @@ class ChoosersController < ApplicationController
 
   # GET /choosers or /choosers.json
   def index
-    @choosers = @stream.choosers
+    @choosers = @stream.choosers.includes(:song)
   end
 
   # GET /choosers/1 or /choosers/1.json
