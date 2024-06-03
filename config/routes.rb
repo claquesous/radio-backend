@@ -7,11 +7,11 @@ Rails.application.routes.draw do
     resources :sessions
     resources :streams do
       resources :choosers, except: [:new, :create, :destroy]
+      resources :ratings, only: [:create]
       resources :requests, only: [:index, :create, :show]
       resources :plays, only: [:index, :show]
     end
 
-    resources :ratings, only: [:index, :create, :show]
     resources :plays, only: [:index, :show]
     resources :songs, :albums, :artists, except: :destroy
 
@@ -26,7 +26,7 @@ Rails.application.routes.draw do
         resources :songs, only: :show, module: :streams
         resources :artists, only: :show, module: :streams
         resources :plays, only: [:index, :show]
-        resources :ratings, only: [:index, :show]
+        resources :ratings, only: [:create]
       end
     end
   end

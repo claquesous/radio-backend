@@ -1,35 +1,23 @@
 class RatingsController < ApplicationController
-  # GET /ratings
-  # GET /ratings.json
-  def index
-    @ratings = Rating.all
-  end
-
-  # GET /ratings/1
-  # GET /ratings/1.json
-  def show
-    @rating = Rating.find(params[:id])
-  end
- 
   # POST /ratings
   # POST /ratings.json
   def create
-    @play = Play.find(params[:play_id])
-    @play.build_rating(rating_params.merge(user: user))
+    @stream = Stream.find(params[:stream_id])
+    @rating = Rating.new(rating_params.merge(user: current_user))
 
     respond_to do |format|
-      if @play.save
-        format.html { redirect_to @play, notice: 'Rating was successfully added.' }
-        format.json { render :create, status: :created, location: @play }
+      if @rating.save
+        format.html { redirect_to stream_plays_path(@stream), notice: 'Rating was successfully added.' }
+        format.json { render :create, status: :created }
       else
-        format.html { render :new }
-        format.json { render json: @play.errors, status: :unprocessable_entity }
+        format.html { redirect_to stream_plays_path(@stream), notice: "Rating not added: #{@rating.errors.full_messages.join(", ")}" }
+        format.json { render json: @rating.errors, status: :unprocessable_entity }
       end
     end
   end
 
   private
     def rating_params
-      params.require(:rating).permit(:up)
+      params.require(:rating).permit(:up, :play_id)
     end
 end
