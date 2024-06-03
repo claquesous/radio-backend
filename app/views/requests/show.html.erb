@@ -10,4 +10,9 @@
   <%= @request.requested_at %>
 </p>
 
+<p>
+  <strong>Played:</strong>
+  <%= @request.played %>
+</p>
+
 <%= link_to 'Back', stream_requests_path(@request.stream) %>

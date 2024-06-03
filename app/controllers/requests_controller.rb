@@ -1,5 +1,4 @@
 class RequestsController < ApplicationController
-  before_action :set_stream
   # GET /requests
   # GET /requests.json
   def index
@@ -32,9 +31,5 @@ class RequestsController < ApplicationController
   private
     def request_params
       params.require(:request).permit(:song_id)
-    end
-
-    def set_stream
-      @stream = Stream.find(params[:stream_id] || 1)
     end
 end

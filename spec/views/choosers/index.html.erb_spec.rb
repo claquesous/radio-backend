@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "choosers/index", type: :view do
   before(:each) do
+    assign(:stream, create(:stream))
     assign(:choosers, [
       create(:chooser),
       create(:chooser)

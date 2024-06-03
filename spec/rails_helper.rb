@@ -51,6 +51,7 @@ RSpec.configure do |config|
 
   config.before(:each, type: :request) do
     allow_any_instance_of(ApplicationController).to receive(:require_login).and_return(true)
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(create(:user))
   end
 
   config.include FactoryBot::Syntax::Methods
