@@ -20,7 +20,7 @@ class RequestsController < ApplicationController
     respond_to do |format|
       if @request.save
         format.html { redirect_to stream_plays_path(@stream), notice: 'Request was successfully added.' }
-        format.json { render :create, status: :created }
+        format.json { render :show, status: :created, location: stream_request_path(@stream, @request) }
       else
         format.html { redirect_to stream_plays_path(@stream), notice: "Request not added: #{@request.errors.full_messages.join(", ")}" }
         format.json { render json: @request.errors, status: :unprocessable_entity }

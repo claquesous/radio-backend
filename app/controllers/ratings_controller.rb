@@ -8,7 +8,7 @@ class RatingsController < ApplicationController
     respond_to do |format|
       if @rating.save
         format.html { redirect_to stream_plays_path(@stream), notice: 'Rating was successfully added.' }
-        format.json { render :create, status: :created }
+        format.json { render :show, status: :created, location: stream_rating_path(@stream, @rating) }
       else
         format.html { redirect_to stream_plays_path(@stream), notice: "Rating not added: #{@rating.errors.full_messages.join(", ")}" }
         format.json { render json: @rating.errors, status: :unprocessable_entity }
