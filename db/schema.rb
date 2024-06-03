@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_02_194046) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_03_142742) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -78,6 +78,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_02_194046) do
     t.datetime "updated_at", precision: nil, null: false
     t.bigint "stream_id"
     t.bigint "user_id", null: false
+    t.bigint "play_id"
+    t.index ["play_id"], name: "index_requests_on_play_id"
     t.index ["song_id"], name: "index_requests_on_song_id"
     t.index ["stream_id"], name: "index_requests_on_stream_id"
     t.index ["user_id"], name: "index_requests_on_user_id"
@@ -131,6 +133,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_02_194046) do
   add_foreign_key "plays", "streams"
   add_foreign_key "ratings", "plays"
   add_foreign_key "ratings", "users"
+  add_foreign_key "requests", "plays"
   add_foreign_key "requests", "songs"
   add_foreign_key "requests", "streams"
   add_foreign_key "requests", "users"

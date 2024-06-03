@@ -6,6 +6,7 @@ class Play < ApplicationRecord
   has_many :ratings
   default_scope {order(id: :desc)}
   before_create :toot_song, :if => proc { Rails.env.production? }
+  after_create :resolve_requests
 
   def toot_song
     begin
@@ -36,6 +37,10 @@ class Play < ApplicationRecord
   def self.album_ranks(from = nil, to = nil)
     songs = by_date(from, to).joins(:song).where('songs.album_id is not null')
     counts = songs.group(:album_id).order('count_album_id desc').count(:album_id)
+  end
+
+  def resolve_requests
+    stream.requests.where(song: song).where(played: false).update_all(played: true, play_id: id)
   end
 
   private
