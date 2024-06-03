@@ -1,1 +1,1 @@
-json.extract! @rating, :id, :play_id, :user_id, :up, :created_at, :updated_at
+json.extract! @rating, :id, :play, :up, :user_id, :created_at, :updated_at
