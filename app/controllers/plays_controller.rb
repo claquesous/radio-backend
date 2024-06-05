@@ -7,6 +7,11 @@ class PlaysController < ApplicationController
   def index
     limit = (params[:limit] || 25).to_i
     @plays = @stream.plays.includes(:artist, :song, :album).limit(limit)
+
+    @song_ratings = {}
+    @plays.each do |play|
+      @song_ratings[play.song.id] = @stream.choosers.where(song: play.song).pluck(:rating).first
+    end
   end
 
   # GET /plays/1
