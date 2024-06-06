@@ -1,1 +1,3 @@
-json.extract! @rating, :id, :play, :up, :user_id, :created_at, :updated_at
+json.extract! @rating, :play_id, :up, :created_at
+json.new_rating @new_rating
+json.old_rating @old_rating

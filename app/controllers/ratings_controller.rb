@@ -1,12 +1,17 @@
 class RatingsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: :create
+
   # POST /ratings
   # POST /ratings.json
   def create
     @stream = Stream.find(params[:stream_id])
     @rating = Rating.new(rating_params.merge(user: current_user))
+    chooser = @stream.choosers.where(song: @rating.play.song).first
+    @old_rating = chooser.rating
 
     respond_to do |format|
       if @rating.save
+        @new_rating = chooser.reload.rating
         format.html { redirect_to stream_plays_path(@stream), notice: 'Rating was successfully added.' }
         format.json { render :show, status: :created, location: stream_rating_path(@stream, @rating) }
       else
