@@ -16,7 +16,13 @@ RSpec.describe "streams/edit", type: :view do
 
       assert_select "input[name=?]", "stream[name]"
 
-      assert_select "input[name=?]", "stream[user_id]"
+      assert_select "input[name=?]", "stream[default_rating]"
+
+      assert_select "input[name=?]", "stream[default_featured]"
+
+      assert_select "input[name=?]", "stream[mastodon_url]"
+
+      assert_select "input[name=?]", "stream[mastodon_access_token]"
     end
   end
 end

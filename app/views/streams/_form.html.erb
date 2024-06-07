@@ -17,8 +17,13 @@
   </div>
 
   <div>
-    <%= form.label :user_id, style: "display: block" %>
-    <%= form.number_field :user_id %>
+    <%= form.label :default_rating, style: "display: block" %>
+    <%= form.text_field :default_rating %>
+  </div>
+
+  <div>
+    <%= form.label :default_featured, "Include new songs automatically?", style: "display: block" %>
+    <%= form.check_box :default_featured %>
   </div>
 
   <div>
