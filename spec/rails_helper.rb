@@ -56,6 +56,13 @@ RSpec.configure do |config|
     end
   end
 
+  config.before(:each, type: :request, as_logged_in_user: true) do
+    @logged_in_user = create(:user)
+    allow_any_instance_of(ApplicationController).to receive(:current_user) do
+      @_logged_in_user = @logged_in_user
+    end
+  end
+
   config.include FactoryBot::Syntax::Methods
 
 end

@@ -61,4 +61,6 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+
+  ENV['MASTODON_ACCESS_TOKEN_KEY'] = 'dummy_key_which_is_32_bytes_stop'
 end
