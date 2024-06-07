@@ -1,11 +1,33 @@
 require 'rails_helper'
 
 RSpec.describe Rating, type: :model do
-  describe "#validates_latest" do
+  describe "#latest_play" do
     it "doesn't allow ratings for earlier plays" do
       earlier = create(:play)
       create(:play, stream: earlier.stream)
       expect(build(:rating, play: earlier)).to_not be_valid
+    end
+
+    it "allows stream owner to rate earlier plays" do
+      earlier = create(:play)
+      create(:play, stream: earlier.stream)
+      expect(build(:rating, play: earlier, user: earlier.stream.user)).to be_valid
+    end
+  end
+
+  describe "#single_rating" do
+    it "doesn't allow users to rate a play twice" do
+      user = create(:user)
+      play = create(:play)
+      create(:rating, play: play, user: user)
+      expect(build(:rating, play: play, user: user)).to_not be_valid
+    end
+
+    it "allows stream owner to rate multiple times" do
+      stream = create(:stream)
+      play = create(:play, stream: stream)
+      create(:rating, play: play, user: stream.user)
+      expect(build(:rating, play: play, user: stream.user)).to be_valid
     end
   end
 
