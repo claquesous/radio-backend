@@ -52,6 +52,8 @@ FactoryBot.define do
   factory :stream do
     user
     name { "MyStream" }
+    mastodon_url { "https://mastodon.social" }
+    mastodon_access_token { "abcd1234" }
   end
 
   factory :chooser do

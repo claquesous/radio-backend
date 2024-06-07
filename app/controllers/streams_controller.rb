@@ -1,5 +1,6 @@
 class StreamsController < ApplicationController
   before_action :set_stream, only: %i[ show edit update destroy ]
+  before_action :remove_blank_mastodon_access_token, only: :update
 
   # GET /streams or /streams.json
   def index
@@ -70,5 +71,9 @@ class StreamsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def stream_params
       params.require(:stream).permit(:name, :user_id, :mastodon_url, :mastodon_access_token)
+    end
+
+    def remove_blank_mastodon_access_token
+      params[:stream].delete(:mastodon_access_token) if params[:stream][:mastodon_access_token].blank?
     end
 end

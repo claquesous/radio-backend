@@ -87,6 +87,15 @@ RSpec.describe "/streams", type: :request do
   end
 
   describe "PATCH /update" do
+    context "without mastodon access token" do
+      it "doesn't clear out the token", :as_logged_in_user do
+        stream = create(:stream, user: @logged_in_user)
+        patch stream_url(stream), params: { stream: { name: "New stream name", mastodon_access_token: ""} }
+        stream.reload
+        expect(stream.mastodon_access_token).to be_present
+      end
+    end
+
     context "with valid parameters" do
       let(:new_attributes) {
         skip("Add a hash of attributes valid for your model")
