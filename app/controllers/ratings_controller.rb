@@ -12,6 +12,7 @@ class RatingsController < ApplicationController
     respond_to do |format|
       if @rating.save
         @new_rating = chooser.reload.rating
+        @can_rate_again = current_user == @stream.user
         format.html { redirect_to stream_plays_path(@stream), notice: 'Rating was successfully added.' }
         format.json { render :show, status: :created, location: stream_rating_path(@stream, @rating) }
       else
