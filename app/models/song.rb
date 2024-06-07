@@ -6,7 +6,7 @@ class Song < ApplicationRecord
   has_many :plays
   has_many :choosers, dependent: :destroy
   before_create :add_choosers
-  default_scope { order(rating: :desc).where(featured: true) }
+  default_scope { order(:sort) }
 
   def rank(from = nil, to = nil)
     rank = Play.song_ranks(from,to).keys.index(id)
@@ -27,14 +27,12 @@ class Song < ApplicationRecord
     self.year = mp3_info.tag.year
     self.time = mp3_info.length
     self.path = SONGS_DIRECTORY + "/" + s3_path
-    self.featured = true
-    self.rating = 85
     self.sort = title.sub(/^The /, '')
   end
 
   def add_choosers
     Stream.all.each do |stream|
-      choosers.build(stream: stream, rating: rating, featured: featured)
+      choosers.build(stream: stream, rating: stream.default_rating, featured: stream.default_featured)
     end
   end
 end

@@ -24,13 +24,9 @@ RSpec.describe "songs/edit", type: :view do
 
       assert_select "input#song_time[name=?]", "song[time]"
 
-      assert_select "input#song_featured[name=?]", "song[featured]"
-
       assert_select "input#song_live[name=?]", "song[live]"
 
       assert_select "input#song_remix[name=?]", "song[remix]"
-
-      assert_select "input#song_rating[name=?]", "song[rating]"
     end
   end
 end

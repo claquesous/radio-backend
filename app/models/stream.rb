@@ -4,12 +4,13 @@ class Stream < ApplicationRecord
   has_many :plays
   has_many :requests
   before_create :add_choosers
+  validate :default_rating_in_range
 
   attr_encrypted :mastodon_access_token, key: ENV['MASTODON_ACCESS_TOKEN_KEY']
 
   def add_choosers
     Song.all.each do |song|
-      choosers.build(song: song, rating: song.rating, featured: song.featured)
+      choosers.build(song: song, rating: default_rating, featured: default_featured)
     end
   end
 
@@ -67,4 +68,11 @@ class Stream < ApplicationRecord
       end
       true
     end
+
+    def default_rating_in_range
+      if default_rating<0 || default_rating>100
+        errors.add(:default_rating, "must be from 0 to 100")
+      end
+    end
 end
+
