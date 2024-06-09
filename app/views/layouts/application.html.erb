@@ -15,6 +15,8 @@
   <%= link_to "log in", login_path %>.
 <% end %>
 
+  <p id="alert"><%= flash[:alert] %></p>
+
 <%= yield %>
 
 </body>

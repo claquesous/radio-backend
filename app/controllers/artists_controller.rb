@@ -19,16 +19,19 @@ class ArtistsController < ApplicationController
   # GET /artists/new
   def new
     @artist = Artist.new
+    authorize @artist
   end
 
   # GET /artists/1/edit
   def edit
+    authorize @artist
   end
 
   # POST /artists
   # POST /artists.json
   def create
     @artist = Artist.new(artist_params)
+    authorize @artist
 
     respond_to do |format|
       if @artist.save
@@ -44,6 +47,7 @@ class ArtistsController < ApplicationController
   # PATCH/PUT /artists/1
   # PATCH/PUT /artists/1.json
   def update
+    authorize @artist
     respond_to do |format|
       if @artist.update(artist_params)
         format.html { redirect_to @artist, notice: 'Artist was successfully updated.' }

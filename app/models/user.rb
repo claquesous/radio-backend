@@ -8,4 +8,11 @@ class User < ApplicationRecord
   validates_presence_of :password, :on => :create
   validates_presence_of :email
   validates_uniqueness_of :email
+
+  before_create :set_initial_admin
+
+  private
+  def set_initial_admin
+    self.admin = User.count==0
+  end
 end
