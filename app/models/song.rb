@@ -1,5 +1,6 @@
 class Song < ApplicationRecord
   include SlugHelper
+  include Rankable
 
   belongs_to :album, optional: true
   belongs_to :artist
@@ -7,16 +8,6 @@ class Song < ApplicationRecord
   has_many :choosers, dependent: :destroy
   before_create :add_choosers
   default_scope { order(:sort) }
-
-  def rank(from = nil, to = nil)
-    rank = Play.song_ranks(from,to).keys.index(id)
-    rank + 1 if rank
-  end
-
-  def stream_rank(stream, from = nil, to = nil)
-    rank = stream.song_ranks(from,to).keys.index(id)
-    rank + 1 if rank
-  end
 
   def s3_path
     "#{to_slug artist.name}/#{to_slug album.try(:title) || 'singles'}/#{to_slug title}"
