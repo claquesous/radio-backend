@@ -49,7 +49,7 @@ class SongsController < ApplicationController
     else
       # Artist exists, create the song and associate it with the artist
       @song = @artist.songs.build
-      @song.authorize
+      authorize @song
       @song.from_mp3_info(mp3_info)
       upload_to_s3(uploaded_file)
 
@@ -64,7 +64,7 @@ class SongsController < ApplicationController
   # PATCH/PUT /songs/1
   # PATCH/PUT /songs/1.json
   def update
-    @song.authorize
+    authorize @song
     respond_to do |format|
       if @song.update(song_params)
         format.html { redirect_to @song, notice: 'Song was successfully updated.' }
