@@ -19,16 +19,19 @@ class AlbumsController < ApplicationController
   # GET /albums/new
   def new
     @album = Album.new
+    authorize @album
   end
 
   # GET /albums/1/edit
   def edit
+    authorize @album
   end
 
   # POST /albums
   # POST /albums.json
   def create
     @album = Album.new(album_params)
+    authorize @album
 
     respond_to do |format|
       if @album.save
@@ -44,6 +47,7 @@ class AlbumsController < ApplicationController
   # PATCH/PUT /albums/1
   # PATCH/PUT /albums/1.json
   def update
+    authorize @album
     respond_to do |format|
       if @album.update(album_params)
         format.html { redirect_to @album, notice: 'Album was successfully updated.' }

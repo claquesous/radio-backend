@@ -47,6 +47,7 @@ FactoryBot.define do
   factory :user do
     sequence(:email) { |n| "user#{n}@example.org" }
     password { "passw0rd" }
+    admin { false }
   end
 
   factory :stream do
