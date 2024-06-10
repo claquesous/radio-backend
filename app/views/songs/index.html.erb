@@ -7,6 +7,7 @@
     <tr>
       <th>Album</th>
       <th>Artist</th>
+      <th>Artist Name Override</th>
       <th>Title</th>
       <th>Sort</th>
       <th>Slug</th>
@@ -24,6 +25,7 @@
       <tr>
         <td><%= link_to song.album.title, song.album if song.album %></td>
         <td><%= link_to song.artist.name, song.artist %></td>
+        <td><%= song.artist_name_override %></td>
         <td><%= song.title %></td>
         <td><%= song.sort %></td>
         <td><%= song.slug %></td>

@@ -1,6 +1,5 @@
-require 'mp3info'
-
 class SongsController < ApplicationController
+  include Mp3Attrs
   before_action :set_song, only: [:show, :edit, :update]
 
   # GET /songs
@@ -36,22 +35,18 @@ class SongsController < ApplicationController
 
   # POST /songs
   def create
-    uploaded_file = params[:song][:file]
-    mp3_info = Mp3Info.new(uploaded_file.tempfile.path)
-
-    artist_name = mp3_info.tag.artist
-    @artist = Artist.find_or_initialize_by(name: artist_name)
+    @artist = Artist.find_or_initialize_by(name: mp3_artist_name)
 
     if @artist.new_record?
       # Artist doesn't exist, prompt the user to create a new one
-      @artist.sort = @artist.name.sub(/^The /, '')
+      @artist.sort = mp3_artist_sort
       render "artists/new", locals: { artist: @artist }, notice: "Artist does not exist!"
     else
       # Artist exists, create the song and associate it with the artist
       @song = @artist.songs.build
       authorize @song
-      @song.from_mp3_info(mp3_info)
-      upload_to_s3(uploaded_file)
+      @song.assign_attributes mp3_song_attrs
+      upload_to_s3
 
       if @song.save
         redirect_to @song, notice: 'Song was successfully created.'
@@ -84,13 +79,16 @@ class SongsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def song_params
-      params.require(:song).permit(:album, :artist_id, :title, :sort, :slug, :track, :time, :featured, :live, :remix, :rating, :path)
+      params.require(:song).permit(:album, :artist_id, :artist_name_override, :title, :sort, :slug, :track, :time, :featured, :live, :remix, :rating, :path)
     end
 
-    def upload_to_s3(file)
+    def upload_to_s3
       s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
-      obj = s3.bucket(ENV['AWS_S3_BUCKET']).object(@song.s3_path)
+      obj = s3.bucket(ENV['AWS_S3_BUCKET']).object(s3_path)
+      obj.upload_file(uploaded_file.tempfile.path)
+    end
 
-      obj.upload_file(file.tempfile.path)
+    def uploaded_file
+      params[:song][:file]
     end
 end
