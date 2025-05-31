@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.1.4'
+ruby '3.4.4'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 7.1.0'
+gem 'rails', '~> 8.0.2'
 gem 'pg'
 # Use Puma as the app server
 gem 'puma', '~> 6.0'
@@ -73,4 +73,3 @@ gem 'sorcery'
 gem 'pundit'
 
 gem 'attr_encrypted', '~> 4.1.0'
-
