@@ -1,4 +1,6 @@
 class RequestsController < ApplicationController
+  include Authenticable
+  skip_before_action :authenticate_request, only: [:index, :show]
   skip_before_action :verify_authenticity_token, only: :create
 
   # GET /requests

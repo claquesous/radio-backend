@@ -1,4 +1,6 @@
 class RatingsController < ApplicationController
+  include Authenticable
+  skip_before_action :authenticate_request, only: [:show]
   skip_before_action :verify_authenticity_token, only: :create
 
   # POST /ratings
