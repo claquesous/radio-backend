@@ -1,5 +1,6 @@
 class AuthsController < ApplicationController
   include Authenticable
+  skip_before_action :authenticate_request, only: [:create]
   skip_before_action :require_login, only: [:create]
   skip_before_action :verify_authenticity_token, only: [:create]
 
