@@ -1,17 +1,22 @@
 class AuthorizeApiRequest
-  prepend SimpleCommand
+  attr_reader :headers, :errors
 
   def initialize(headers = {})
     @headers = headers
+    @errors = ActiveModel::Errors.new(self)
   end
 
-  def call
+  def self.call(headers = {})
+    command = new(headers)
+    result = command.call_instance
+    OpenStruct.new(success?: command.errors.empty?, failure?: !command.errors.empty?, result: result, errors: command.errors)
+  end
+
+  def call_instance
     user
   end
 
   private
-
-  attr_reader :headers
 
   def user
     @user ||= User.find(decoded_auth_token[:user_id]) if decoded_auth_token
