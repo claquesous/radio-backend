@@ -367,6 +367,7 @@ DEPENDENCIES
   factory_bot_rails
   jbuilder (~> 2.7)
   jsbundling-rails
+  jwt
   listen (~> 3.3)
   mastodon-api
   pg
