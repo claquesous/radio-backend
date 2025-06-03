@@ -14,12 +14,4 @@ class AuthsController < ApplicationController
       render json: { error: "Invalid email or password" }, status: :unauthorized
     end
   end
-
-  def current_user_profile
-    if current_user
-      render json: { user: current_user.as_json(only: [:id, :email, :admin]) }, status: :ok
-    else
-      render json: { error: "Not authenticated" }, status: :unauthorized
-    end
-  end
 end
