@@ -20,6 +20,8 @@ Rails.application.routes.draw do
 
   scope :api, defaults: {format: :json} do
     constraints format: :json do
+      post 'login', to: 'auths#create'
+
       resources :plays, only: [:index, :show]
       resources :songs, :albums, :artists, only: [:index, :show]
       resources :streams, only: [:index, :show] do

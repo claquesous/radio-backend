@@ -71,5 +71,6 @@ gem 'aws-sdk-s3', '~> 1.146', '>= 1.146.1'
 gem 'sorcery'
 
 gem 'pundit'
+gem 'jwt'
 
 gem 'attr_encrypted', '~> 4.1.0'
