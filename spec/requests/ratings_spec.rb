@@ -2,6 +2,10 @@ require 'rails_helper'
 
 RSpec.describe "Ratings", type: :request do
   describe "POST /ratings" do
+    before :each do
+      allow_any_instance_of(RatingsController).to receive(:authenticate_request)
+    end
+
     it "redirects" do
       play = create(:play)
       post stream_ratings_path(play.stream), params: { rating: { up: true, play_id: play.id }}
