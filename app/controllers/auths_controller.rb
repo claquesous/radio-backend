@@ -14,7 +14,7 @@ class AuthsController < ApplicationController
         same_site: :lax,
         expires: 1.day.from_now
       }
-      render json: { token: token }, status: :created
+      render json: { token: token, user: user.as_json(only: [:id, :email, :admin]) }, status: :ok
     else
       render json: { error: "Email or password was invalid" }, status: :unauthorized
     end
