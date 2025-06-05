@@ -1,8 +1,7 @@
 class PlaysController < ApplicationController
+  skip_before_action :authenticate_request, only: [:index, :show, :create]
   before_action :set_stream
-  skip_before_action :verify_authenticity_token, only: :create
 
-  # GET /plays
   # GET /plays.json
   def index
     limit = (params[:limit] || 25).to_i
@@ -12,27 +11,23 @@ class PlaysController < ApplicationController
     @plays.each do |play|
       @song_ratings[play.song.id] = @stream.choosers.where(song: play.song).pluck(:rating).first
     end
+    render :index
   end
 
-  # GET /plays/1
   # GET /plays/1.json
   def show
     @play = Play.find(params[:id])
+    render :show
   end
 
-  # POST /plays
   # POST /plays.json
   def create
     @play = @stream.next_play
 
-    respond_to do |format|
-      if @play.save
-        format.html { redirect_to @play, notice: 'Play was successfully created.' }
-        format.json { render :create, status: :created, location: @play }
-      else
-        format.html { render :new }
-        format.json { render json: @play.errors, status: :unprocessable_entity }
-      end
+    if @play.save
+      render :create, status: :created, location: @play
+    else
+      render json: @play.errors, status: :unprocessable_entity
     end
   end
 

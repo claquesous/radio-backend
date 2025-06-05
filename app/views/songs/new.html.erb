@@ -1,8 +1,0 @@
-<h1>Upload New Song</h1>
-
-<%= form_with model: @song, url: songs_path, local: true do |form| %>
-  <%= form.file_field :file %>
-  <%= form.submit 'Upload' %>
-<% end %>
-
-<%= link_to 'Back', songs_path %>

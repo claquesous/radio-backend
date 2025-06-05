@@ -8,24 +8,29 @@ module Authenticable
   private
 
   def authenticate_request
-    @current_user = nil
-
-    token = http_auth_header
-    begin
-      decoded_token = decode_token(token) if token
-      @current_user = User.find(decoded_token[:user_id]) if decoded_token
-    rescue JWT::DecodeError, ActiveRecord::RecordNotFound => e
-      # Authentication failed, @current_user remains nil
-    end
-
+    @current_user = authenticate_with_jwt(jwt_from_header)
     render json: { error: 'Not Authorized' }, status: 401 unless @current_user
   end
 
-  def http_auth_header
-    request.headers['Authorization'].present? ? request.headers['Authorization'].split(' ').last : nil
+  def authenticate_with_jwt(token)
+    return nil unless token
+    begin
+      decoded_token = decode_jwt(token)
+      User.find(decoded_token[:user_id]) if decoded_token
+    rescue JWT::DecodeError, ActiveRecord::RecordNotFound
+      nil
+    end
   end
 
-  def decode_token(token)
+  def jwt_from_header
+    if request.headers['Authorization'].present?
+      request.headers['Authorization'].split(' ').last
+    else
+      nil
+    end
+  end
+
+  def decode_jwt(token)
     body = JWT.decode(token, Rails.application.secret_key_base)[0]
     HashWithIndifferentAccess.new body
   end

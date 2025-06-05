@@ -1,74 +1,53 @@
 class StreamsController < ApplicationController
-  before_action :set_stream, only: %i[ show edit update destroy ]
+  skip_before_action :authenticate_request, only: [:index, :show]
+
+  before_action :set_stream, only: %i[ show update destroy ]
   before_action :remove_blank_mastodon_access_token, only: :update
 
-  # GET /streams or /streams.json
+  # GET /streams.json
   def index
     @streams = policy_scope(Stream)
+    render :index
   end
 
-  # GET /streams/1 or /streams/1.json
+  # GET /streams/1.json
   def show
     authorize @stream
+    render :show
   end
 
-  # GET /streams/new
-  def new
-    @stream = Stream.new
-  end
-
-  # GET /streams/1/edit
-  def edit
-    authorize @stream
-  end
-
-  # POST /streams or /streams.json
+  # POST /streams.json
   def create
     @stream = Stream.new(stream_params)
-
-    respond_to do |format|
-      if @stream.save
-        format.html { redirect_to stream_url(@stream), notice: "Stream was successfully created." }
-        format.json { render :show, status: :created, location: @stream }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @stream.errors, status: :unprocessable_entity }
-      end
+    if @stream.save
+      render :show, status: :created, location: @stream
+    else
+      render json: @stream.errors, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /streams/1 or /streams/1.json
+  # PATCH/PUT /streams/1.json
   def update
     authorize @stream
-    respond_to do |format|
-      if @stream.update(stream_params)
-        format.html { redirect_to stream_url(@stream), notice: "Stream was successfully updated." }
-        format.json { render :show, status: :ok, location: @stream }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @stream.errors, status: :unprocessable_entity }
-      end
+    if @stream.update(stream_params)
+      render :show, status: :ok, location: @stream
+    else
+      render json: @stream.errors, status: :unprocessable_entity
     end
   end
 
-  # DELETE /streams/1 or /streams/1.json
+  # DELETE /streams/1.json
   def destroy
     authorize @stream
     @stream.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to streams_url, notice: "Stream was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    head :no_content
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_stream
       @stream = Stream.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
     def stream_params
       params.require(:stream).permit(:name, :user_id, :default_rating, :default_featured, :mastodon_url, :mastodon_access_token)
     end
