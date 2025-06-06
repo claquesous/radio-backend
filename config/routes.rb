@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   scope :api, defaults: {format: :json} do
     constraints format: :json do
       post 'login', to: 'auths#create'
+      delete 'logout', to: 'auths#destroy'
 
       resources :users, only: [:create]
       resources :plays, except: [:new, :edit]

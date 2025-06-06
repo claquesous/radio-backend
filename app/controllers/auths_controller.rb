@@ -1,5 +1,5 @@
 class AuthsController < ApplicationController
-  skip_before_action :authenticate_request, only: [:create]
+  skip_before_action :authenticate_request, only: [:create, :destroy]
 
   # POST /api/login (JWT authentication)
   def create
@@ -18,6 +18,12 @@ class AuthsController < ApplicationController
     else
       render json: { error: "Email or password was invalid" }, status: :unauthorized
     end
+  end
+
+  # DELETE /api/logout
+  def destroy
+    cookies.delete(:jwt, httponly: true, secure: Rails.env.production?, same_site: :lax)
+    head :no_content
   end
 
   # GET /private/auth (JWT session check for nginx)
