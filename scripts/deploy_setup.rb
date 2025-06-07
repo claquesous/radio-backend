@@ -2,10 +2,12 @@
 
 require 'fileutils'
 require 'time'
+require 'open3'
+
 DEPLOY_DIR = '/opt/claqradio/radio-backend/'
 RELEASES_DIR = File.join(DEPLOY_DIR, 'releases')
 CURRENT_SYMLINK = File.join(DEPLOY_DIR, 'current')
-NEXT_DIR = File.join(DEPLOY_DIR, 'next')
+NEXT_SYMLINK = File.join(DEPLOY_DIR, 'next')
 PREVIOUS_SYMLINK = File.join(DEPLOY_DIR, 'previous')
 KEEP_RELEASES = 5
 
@@ -16,9 +18,8 @@ current_dir = File.expand_path(File.readlink(CURRENT_SYMLINK)) if File.exist?(CU
 timestamp = Time.now.utc.strftime('%Y%m%d%H%M%S')
 new_release_dir = File.join(RELEASES_DIR, timestamp)
 
-# Move 'next' (artifact extraction) to new release directory
-puts "Moving 'next' to #{new_release_dir}"
-FileUtils.mv(NEXT_DIR, new_release_dir)
+FileUtils.mkdir_p(new_release_dir)
+puts "Created new release directory: #{new_release_dir}"
 
 puts "Starting deployment process..."
 
@@ -37,9 +38,10 @@ if File.exist?(CURRENT_SYMLINK)
   puts "Removed existing 'current' symlink"
 end
 
-# Set current to new release
-FileUtils.ln_s(new_release_dir, CURRENT_SYMLINK)
-puts "Created deployment symlink: current → #{new_release_dir}"
+# Set next as current
+next_target = File.readlink(NEXT_SYMLINK)
+FileUtils.ln_s(next_target, CURRENT_SYMLINK)
+puts "Created deployment symlink: current → #{next_target}"
 
 puts "Deployment completed!"
 
