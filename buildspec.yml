@@ -5,6 +5,7 @@ phases:
     runtime-versions:
       ruby: 3.4
     commands:
+      - ruby --version
       - gem install bundler -v 2.5.10
       - bundle install --deployment
   post_build:
