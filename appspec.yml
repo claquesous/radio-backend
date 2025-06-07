@@ -5,10 +5,6 @@ files:
     destination: /opt/claqradio/radio-backend/next
 permissions:
   - object: /opt/claqradio/radio-backend/next
-    pattern: ""
-    owner: ubuntu
-    group: ubuntu
-  - object: /opt/claqradio/radio-backend/next
     pattern: "**"
     owner: ubuntu
     group: ubuntu
