@@ -2,11 +2,13 @@
 
 require 'fileutils'
 require 'time'
+require 'open3'
 
 DEPLOY_DIR = '/opt/claqradio/radio-backend/'
 RELEASES_DIR = File.join(DEPLOY_DIR, 'releases')
 CURRENT_SYMLINK = File.join(DEPLOY_DIR, 'current')
 NEXT_SYMLINK = File.join(DEPLOY_DIR, 'next')
+PREVIOUS_SYMLINK = File.join(DEPLOY_DIR, 'previous')
 KEEP_RELEASES = 5
 
 FileUtils.mkdir_p(RELEASES_DIR)
@@ -44,4 +46,37 @@ if File.exist?(NEXT_SYMLINK)
 end
 FileUtils.ln_s(new_release_dir, NEXT_SYMLINK)
 puts "Updated 'next' symlink to: #{new_release_dir}"
+
+puts "Starting deployment process..."
+
+# Backup current to previous
+if File.exist?(PREVIOUS_SYMLINK)
+  FileUtils.rm(PREVIOUS_SYMLINK)
+  puts "Removed existing 'previous' symlink"
+end
+
+if File.exist?(CURRENT_SYMLINK)
+  FileUtils.cp_r(CURRENT_SYMLINK, PREVIOUS_SYMLINK, preserve: true)
+  puts "Created backup: current → previous"
+
+  FileUtils.rm(CURRENT_SYMLINK)
+  puts "Removed existing 'current' symlink"
+end
+
+# Set next as current
+FileUtils.cp_r(NEXT_SYMLINK, CURRENT_SYMLINK, preserve: true)
+puts "Deployed: next → current"
+
+# Restart the service
+puts "Restarting service..."
+stdout, stderr, status = Open3.capture3("sudo systemctl restart claqradio-backend.service")
+
+if status.success?
+  puts "Service restarted successfully!"
+else
+  puts "Error restarting service:"
+  puts stderr
+end
+
+puts "Deployment completed!"
 
