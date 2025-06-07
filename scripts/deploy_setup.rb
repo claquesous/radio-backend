@@ -45,7 +45,8 @@ if File.directory?(NEXT_DIR)
     next if entry == '.' || entry == '..'
     src = File.join(NEXT_DIR, entry)
     dest = File.join(new_release_dir, entry)
-    FileUtils.mv(src, dest)
+    FileUtils.cp_r(src, dest)
+    FileUtils.rm_rf(src)
   end
 end
 
