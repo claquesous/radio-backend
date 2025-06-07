@@ -1,5 +1,7 @@
 module Streams
   class SongsController < ApplicationController
+    skip_before_action :authenticate_request
+
     # GET /streams/1/songs/1.json
     def show
       stream = Stream.find(params[:stream_id])
