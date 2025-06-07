@@ -37,17 +37,13 @@ puts "Cleanup complete. Retained the five most recent and the current directory.
 timestamp = Time.now.utc.strftime('%Y%m%d%H%M%S')
 new_release_dir = File.join(RELEASES_DIR, timestamp)
 
-FileUtils.mkdir_p(new_release_dir)
-puts "Created new release directory: #{new_release_dir}"
-
-if File.directory?(NEXT_DIR)
-  Dir.entries(NEXT_DIR).each do |entry|
-    next if entry == '.' || entry == '..'
-    src = File.join(NEXT_DIR, entry)
-    dest = File.join(new_release_dir, entry)
-    FileUtils.cp_r(src, dest)
-    FileUtils.rm_rf(src)
-  end
+# Move the extracted artifact directory into the new release directory
+tmp_extract_dir = File.join(NEXT_DIR, "tmp")
+if File.directory?(tmp_extract_dir)
+  FileUtils.mv(tmp_extract_dir, new_release_dir)
+  puts "Moved #{tmp_extract_dir} to #{new_release_dir}"
+else
+  puts "ERROR: Expected artifact extraction directory #{tmp_extract_dir} does not exist."
 end
 
 if File.exist?(CURRENT_SYMLINK)
