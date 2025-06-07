@@ -24,6 +24,8 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'mastodon-api', require: 'mastodon'
 gem 'ruby-mp3info'
+
+gem 'ostruct'
 gem 'aws-sdk-s3', '~> 1.146', '>= 1.146.1'
 gem 'sorcery'
 gem 'pundit'
