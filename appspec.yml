@@ -12,3 +12,5 @@ hooks:
   BeforeInstall:
     - location: scripts/deploy_setup.rb
       runas: ubuntu
+  ApplicationStart:
+    - location: /usr/bin/systemctl restart claqradio-backend.service
