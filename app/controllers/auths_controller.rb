@@ -28,11 +28,12 @@ class AuthsController < ApplicationController
 
   # GET /private/auth (JWT session check for nginx)
   def logged_in
-    @current_user = authenticate_with_jwt(cookies[:jwt])
-    if @current_user
-      head :ok
-    else
-      head :unauthorized
-    end
+    head @current_user ? :ok : :unauthorized
+  end
+
+  private
+
+  def jwt_token
+    cookies[:jwt]
   end
 end

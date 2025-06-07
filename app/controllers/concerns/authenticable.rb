@@ -8,11 +8,12 @@ module Authenticable
   private
 
   def authenticate_request
-    @current_user = authenticate_with_jwt(jwt_from_header)
+    @current_user = authenticate_with_jwt
     render json: { error: 'Not Authorized' }, status: 401 unless @current_user
   end
 
-  def authenticate_with_jwt(token)
+  def authenticate_with_jwt
+    token = jwt_token
     return nil unless token
     begin
       decoded_token = decode_jwt(token)
@@ -22,7 +23,7 @@ module Authenticable
     end
   end
 
-  def jwt_from_header
+  def jwt_token
     if request.headers['Authorization'].present?
       request.headers['Authorization'].split(' ').last
     else
