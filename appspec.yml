@@ -10,7 +10,8 @@ permissions:
     group: ubuntu
 hooks:
   BeforeInstall:
+    - location: scripts/prepare_next.sh
+      runas: ubuntu
+  AfterInstall:
     - location: scripts/deploy_setup.rb
       runas: ubuntu
-  ApplicationStart:
-    - location: /usr/bin/systemctl restart claqradio-backend.service

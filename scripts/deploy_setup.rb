@@ -6,7 +6,7 @@ require 'time'
 DEPLOY_DIR = '/opt/claqradio/radio-backend/'
 RELEASES_DIR = File.join(DEPLOY_DIR, 'releases')
 CURRENT_SYMLINK = File.join(DEPLOY_DIR, 'current')
-NEXT_SYMLINK = File.join(DEPLOY_DIR, 'next')
+NEXT_DIR = File.join(DEPLOY_DIR, 'next')
 PREVIOUS_SYMLINK = File.join(DEPLOY_DIR, 'previous')
 KEEP_RELEASES = 5
 
@@ -40,11 +40,14 @@ new_release_dir = File.join(RELEASES_DIR, timestamp)
 FileUtils.mkdir_p(new_release_dir)
 puts "Created new release directory: #{new_release_dir}"
 
-if File.exist?(NEXT_SYMLINK)
-  FileUtils.rm(NEXT_SYMLINK)
+if File.directory?(NEXT_DIR)
+  Dir.entries(NEXT_DIR).each do |entry|
+    next if entry == '.' || entry == '..'
+    src = File.join(NEXT_DIR, entry)
+    dest = File.join(new_release_dir, entry)
+    FileUtils.mv(src, dest)
+  end
 end
-FileUtils.ln_s(new_release_dir, NEXT_SYMLINK)
-puts "Updated 'next' symlink to: #{new_release_dir}"
 
 if File.exist?(CURRENT_SYMLINK)
   if File.exist?(PREVIOUS_SYMLINK)
@@ -57,3 +60,8 @@ end
 
 FileUtils.ln_s(new_release_dir, CURRENT_SYMLINK)
 puts "Updated 'current' symlink to: #{new_release_dir}"
+
+# Restart the backend service
+puts "Restarting claqradio-backend.service..."
+system("sudo systemctl restart claqradio-backend.service")
+puts "Service restarted."
