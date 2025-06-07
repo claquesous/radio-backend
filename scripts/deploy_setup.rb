@@ -21,12 +21,6 @@ new_release_dir = File.join(RELEASES_DIR, timestamp)
 FileUtils.mkdir_p(new_release_dir)
 puts "Created new release directory: #{new_release_dir}"
 
-if File.exist?(NEXT_SYMLINK)
-  FileUtils.rm(NEXT_SYMLINK)
-end
-FileUtils.ln_s(new_release_dir, NEXT_SYMLINK)
-puts "Updated 'next' symlink to: #{new_release_dir}"
-
 puts "Starting deployment process..."
 
 # Backup current to previous
@@ -48,17 +42,6 @@ end
 next_target = File.readlink(NEXT_SYMLINK)
 FileUtils.ln_s(next_target, CURRENT_SYMLINK)
 puts "Created deployment symlink: current → #{next_target}"
-
-# Restart the service
-puts "Restarting service..."
-stdout, stderr, status = Open3.capture3("sudo systemctl restart claqradio-backend.service")
-
-if status.success?
-  puts "Service restarted successfully!"
-else
-  puts "Error restarting service:"
-  puts stderr
-end
 
 puts "Deployment completed!"
 
@@ -102,4 +85,3 @@ all_dirs.each do |dir|
 end
 
 puts "Final cleanup complete. Kept exactly #{keep_dirs.size} releases."
-
