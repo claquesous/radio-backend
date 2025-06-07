@@ -15,26 +15,6 @@ FileUtils.mkdir_p(RELEASES_DIR)
 
 current_dir = File.expand_path(File.readlink(CURRENT_SYMLINK)) if File.exist?(CURRENT_SYMLINK)
 
-dirs = Dir.entries(RELEASES_DIR).select do |entry|
-  path = File.join(RELEASES_DIR, entry)
-  File.directory?(path) && !(entry == '.' || entry == '..')
-end.sort_by do |entry|
-  File.mtime(File.join(RELEASES_DIR, entry))
-end.reverse
-
-keep_dirs = dirs.first(KEEP_RELEASES).map { |dir| File.join(RELEASES_DIR, dir) }
-keep_dirs << current_dir if current_dir
-
-dirs.each do |dir|
-  full_path = File.join(RELEASES_DIR, dir)
-  unless keep_dirs.include?(full_path)
-    FileUtils.rm_rf(full_path)
-    puts "Deleted directory: #{full_path}"
-  end
-end
-
-puts "Cleanup complete. Retained the five most recent and the current directory."
-
 timestamp = Time.now.utc.strftime('%Y%m%d%H%M%S')
 new_release_dir = File.join(RELEASES_DIR, timestamp)
 
@@ -56,16 +36,18 @@ if File.exist?(PREVIOUS_SYMLINK)
 end
 
 if File.exist?(CURRENT_SYMLINK)
-  FileUtils.cp_r(CURRENT_SYMLINK, PREVIOUS_SYMLINK, preserve: true)
-  puts "Created backup: current → previous"
-
+  current_target = File.readlink(CURRENT_SYMLINK)
+  FileUtils.ln_s(current_target, PREVIOUS_SYMLINK)
+  puts "Created backup symlink: previous → #{current_target}"
+  
   FileUtils.rm(CURRENT_SYMLINK)
   puts "Removed existing 'current' symlink"
 end
 
 # Set next as current
-FileUtils.cp_r(NEXT_SYMLINK, CURRENT_SYMLINK, preserve: true)
-puts "Deployed: next → current"
+next_target = File.readlink(NEXT_SYMLINK)
+FileUtils.ln_s(next_target, CURRENT_SYMLINK)
+puts "Created deployment symlink: current → #{next_target}"
 
 # Restart the service
 puts "Restarting service..."
@@ -79,4 +61,45 @@ else
 end
 
 puts "Deployment completed!"
+
+puts "Running final cleanup..."
+# Get all release directories again after deployment
+all_dirs = Dir.entries(RELEASES_DIR).select do |entry|
+  path = File.join(RELEASES_DIR, entry)
+  File.directory?(path) && !(entry == '.' || entry == '..')
+end.sort_by do |entry|
+  File.mtime(File.join(RELEASES_DIR, entry))
+end.reverse
+
+# Identify symlink targets that must be preserved
+current_target = File.readlink(CURRENT_SYMLINK) if File.exist?(CURRENT_SYMLINK)
+previous_target = File.readlink(PREVIOUS_SYMLINK) if File.exist?(PREVIOUS_SYMLINK)
+
+# Create array of directories to keep
+keep_dirs = []
+keep_dirs << current_target if current_target
+keep_dirs << previous_target if previous_target
+
+# Add additional recent directories up to KEEP_RELEASES total
+all_dirs.each do |dir|
+  full_path = File.join(RELEASES_DIR, dir)
+  # Skip if already in keep_dirs
+  next if keep_dirs.include?(full_path)
+  
+  # Add to keep_dirs if we haven't reached the limit
+  if keep_dirs.size < KEEP_RELEASES
+    keep_dirs << full_path
+  end
+end
+
+# Delete everything not in keep_dirs
+all_dirs.each do |dir|
+  full_path = File.join(RELEASES_DIR, dir)
+  unless keep_dirs.include?(full_path)
+    FileUtils.rm_rf(full_path)
+    puts "Deleted old release: #{full_path}"
+  end
+end
+
+puts "Final cleanup complete. Kept exactly #{keep_dirs.size} releases."
 
