@@ -9,7 +9,7 @@ class RatingsController < ApplicationController
     if @rating.save
       @new_rating = chooser.reload.rating
       @can_rate_again = current_user == @stream.user
-      render :show, status: :created, location: stream_rating_path(@stream, @rating)
+      render :show, status: :created, location: stream_ratings_path(@stream, @rating)
     else
       render json: @rating.errors, status: :unprocessable_entity
     end
