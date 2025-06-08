@@ -4,14 +4,6 @@ RSpec.describe PlaysController, type: :routing do
   describe "routing" do
 
     it "routes to #index" do
-      expect(:get => "/admin/plays").to route_to("plays#index")
-    end
-
-    it "routes to #show" do
-      expect(:get => "/admin/plays/1").to route_to("plays#show", :id => "1")
-    end
-
-    it "routes to #index" do
       expect(:get => "/api/plays").to route_to("plays#index", format: :json)
     end
 
@@ -20,7 +12,7 @@ RSpec.describe PlaysController, type: :routing do
     end
 
     it "routes to #create" do
-      expect(:post => "/private/plays").to route_to("plays#create")
+      expect(:post => "/private/streams/1/plays").to route_to("plays#create", stream_id: "1")
     end
 
   end

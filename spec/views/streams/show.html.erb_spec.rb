@@ -7,6 +7,7 @@ RSpec.describe "streams/show", type: :view do
 
   it "renders attributes in <p>" do
     render
+    puts rendered
     expect(rendered).to match(/MyStream/)
   end
 end
