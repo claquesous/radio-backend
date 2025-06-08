@@ -5,7 +5,7 @@ Rails.application.routes.draw do
       delete 'logout', to: 'auths#destroy'
 
       resources :users, only: [:create]
-      resources :plays, except: [:new, :edit]
+      resources :plays, only: [:index, :show]
       resources :songs, :albums, :artists, except: [:new, :edit]
       resources :streams, except: [:new, :edit] do
         resources :songs, only: :show, module: :streams
@@ -21,6 +21,6 @@ Rails.application.routes.draw do
   scope :private do
     post "streams/:stream_id/plays", to: "plays#create"
 
-    get "auth", to: "auths#logged_in"
+    get "auth", to: "auths#show"
   end
 end

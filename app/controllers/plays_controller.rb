@@ -1,5 +1,5 @@
 class PlaysController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index, :show, :create]
+  skip_before_action :authenticate_request
   before_action :set_stream
 
   # GET /plays.json
