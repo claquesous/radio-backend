@@ -6,12 +6,6 @@ RSpec.describe "Ratings", type: :request do
       allow_any_instance_of(RatingsController).to receive(:authenticate_request)
     end
 
-    it "redirects" do
-      play = create(:play)
-      post stream_ratings_path(play.stream), params: { rating: { up: true, play_id: play.id }}
-      expect(response).to have_http_status(302)
-    end
-
     it "responds with 201" do
       play = create(:play)
       post stream_ratings_path(play.stream, format: :json), params: { rating: { up: true, play_id: play.id }}

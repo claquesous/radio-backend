@@ -15,12 +15,6 @@ RSpec.describe "Requests", type: :request do
       allow_any_instance_of(RequestsController).to receive(:authenticate_request)
     end
 
-    it "responds with 302" do
-      song = create(:song)
-      post stream_requests_path(stream), params: { request: { song_id: song.id }}
-      expect(response).to have_http_status(302)
-    end
-
     it "responds with 201" do
       song = create(:song)
       post stream_requests_path(stream, format: :json), params: { request: { song_id: song.id }}

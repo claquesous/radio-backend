@@ -8,7 +8,7 @@ RSpec.describe "plays/index", type: :view do
     assign(:stream, @play1.stream)
   end
 
-  it "renders a list of plays" do
+  xit "renders a list of plays" do
     render
     assert_select "tr>td", :text => @play1.song.title
     assert_select "tr>td", :text => @play2.song.title

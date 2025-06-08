@@ -50,7 +50,7 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   config.before(:each, type: :request) do
-    allow_any_instance_of(ApplicationController).to receive(:require_login).and_return(true)
+    allow_any_instance_of(ApplicationController).to receive(:authenticate_request).and_return(true)
     allow_any_instance_of(ApplicationController).to receive(:current_user) do
       @_spec_current_user ||= create(:user)
     end

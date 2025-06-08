@@ -30,21 +30,6 @@ RSpec.describe "/songs", type: :request do
     end
   end
 
-  describe "GET /new" do
-    it "renders a successful response" do
-      get new_song_url
-      expect(response).to be_successful
-    end
-  end
-
-  describe "GET /edit" do
-    it "renders a successful response" do
-      song = create(:song)
-      get edit_song_url(song)
-      expect(response).to be_successful
-    end
-  end
-
   describe "POST /create" do
     before do
       ENV['AWS_REGION'] = 'us-fake-1'
@@ -77,9 +62,9 @@ RSpec.describe "/songs", type: :request do
           }.to change(Song, :count).by(1)
         end
 
-        it "redirects to the created song" do
+        it "responds with 201" do
           post songs_url, params: { song: valid_attributes_with_file }
-          expect(response).to redirect_to(song_url(Song.last))
+          expect(response).to be_created
         end
 
         it "uploads the file to s3" do
@@ -109,9 +94,9 @@ RSpec.describe "/songs", type: :request do
       end
 
       context "without existing artist" do
-        it "renders new artist template" do
+        it "responds with an error message" do
           post songs_url, params: { song: valid_attributes_with_file }
-          expect(response.body).to include("New Artist")
+          expect(response.body).to include("Artist does not exist")
         end
       end
     end
