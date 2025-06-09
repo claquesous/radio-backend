@@ -19,6 +19,7 @@ class StreamsController < ApplicationController
   # POST /streams.json
   def create
     @stream = Stream.new(stream_params)
+    @stream.user = current_user
     if @stream.save
       render :show, status: :created, location: @stream
     else
@@ -49,7 +50,7 @@ class StreamsController < ApplicationController
     end
 
     def stream_params
-      params.require(:stream).permit(:name, :user_id, :default_rating, :default_featured, :mastodon_url, :mastodon_access_token)
+      params.require(:stream).permit(:name, :default_rating, :default_featured, :mastodon_url, :mastodon_access_token)
     end
 
     def remove_blank_mastodon_access_token

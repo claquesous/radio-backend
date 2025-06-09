@@ -27,7 +27,7 @@ class AuthsController < ApplicationController
   end
 
   # GET /private/auth (JWT session check for nginx)
-  def logged_in
+  def show
     head @current_user ? :ok : :unauthorized
   end
 
