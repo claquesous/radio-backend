@@ -1,9 +1,4 @@
 class RatingsController < ApplicationController
-  include Authenticable
-  skip_before_action :authenticate_request, only: [:show]
-  skip_before_action :verify_authenticity_token, only: :create
-
-  # POST /ratings
   # POST /ratings.json
   def create
     @stream = Stream.find(params[:stream_id])
@@ -11,16 +6,12 @@ class RatingsController < ApplicationController
     chooser = @stream.choosers.where(song: @rating.play.song).first
     @old_rating = chooser.rating
 
-    respond_to do |format|
-      if @rating.save
-        @new_rating = chooser.reload.rating
-        @can_rate_again = current_user == @stream.user
-        format.html { redirect_to stream_plays_path(@stream), notice: 'Rating was successfully added.' }
-        format.json { render :show, status: :created, location: stream_rating_path(@stream, @rating) }
-      else
-        format.html { redirect_to stream_plays_path(@stream), notice: "Rating not added: #{@rating.errors.full_messages.join(", ")}" }
-        format.json { render json: @rating.errors, status: :unprocessable_entity }
-      end
+    if @rating.save
+      @new_rating = chooser.reload.rating
+      @can_rate_again = current_user == @stream.user
+      render :show, status: :created, location: stream_ratings_path(@stream, @rating)
+    else
+      render json: @rating.errors, status: :unprocessable_entity
     end
   end
 

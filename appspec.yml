@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /opt/claqradio/radio-backend/next
+    destination: /opt/claqradio/radio-backend/next/tmp
 permissions:
   - object: /opt/claqradio/radio-backend/next
     pattern: "**"
@@ -10,6 +10,8 @@ permissions:
     group: ubuntu
 hooks:
   BeforeInstall:
+    - location: scripts/prepare_next.sh
+      runas: ubuntu
+  AfterInstall:
     - location: scripts/deploy_setup.rb
       runas: ubuntu
-

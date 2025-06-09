@@ -1,43 +1,26 @@
 Rails.application.routes.draw do
-  scope :admin do
-    get "logout" => "sessions#destroy", :as => "logout"
-    get "login" => "sessions#new", :as => "login"
-    get "signup" => "users#new", :as => "signup"
-    resources :users
-    resources :sessions
-    resources :streams do
-      resources :choosers, except: [:new, :create, :destroy]
-      resources :ratings, only: [:create]
-      resources :requests, only: [:index, :create, :show]
-      resources :plays, only: [:index, :show]
-    end
-
-    resources :plays, only: [:index, :show]
-    resources :songs, :albums, :artists, except: :destroy
-
-    root 'plays#index'
-  end
-
   scope :api, defaults: {format: :json} do
     constraints format: :json do
       post 'login', to: 'auths#create'
+      delete 'logout', to: 'auths#destroy'
 
+      resources :users, only: [:create]
       resources :plays, only: [:index, :show]
-      resources :songs, :albums, :artists, only: [:index, :show]
-      resources :streams, only: [:index, :show] do
+      resources :songs, :albums, :artists, except: [:new, :edit]
+      resources :streams, except: [:new, :edit] do
         resources :songs, only: :show, module: :streams
         resources :artists, only: :show, module: :streams
-        resources :plays, only: [:index, :show]
-        resources :ratings, only: [:create, :show]
-        resources :requests, only: [:index, :create, :show]
+        resources :plays, except: [:new, :edit]
+        resources :ratings, only: [:create]
+        resources :requests, except: [:new, :edit]
+        resources :choosers, except: [:new, :edit]
       end
     end
   end
 
   scope :private do
     post "streams/:stream_id/plays", to: "plays#create"
-    resources :plays, only: [:create]
 
-    get "auth", to: "sessions#logged_in"
+    get "auth", to: "auths#show"
   end
 end

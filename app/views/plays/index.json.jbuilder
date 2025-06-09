@@ -1,5 +1,8 @@
 json.array!(@plays) do |play|
   json.extract! play, :id, :playtime, :tweet_id
+  json.stream do
+    json.extract! play.stream, :id, :name
+  end
   json.artist do
     json.extract! play.artist, :id, :name
   end

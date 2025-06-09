@@ -1,17 +1,39 @@
 class AuthsController < ApplicationController
-  include Authenticable
-  skip_before_action :authenticate_request, only: [:create]
-  skip_before_action :require_login, only: [:create]
-  skip_before_action :verify_authenticity_token, only: [:create]
+  skip_before_action :authenticate_request, only: [:create, :destroy]
 
+  # POST /api/login (JWT authentication)
   def create
-    user = login(params[:email], params[:password])
+    user = login(params[:email], params[:password], params[:remember_me])
     if user
-      payload = { user_id: user.id, exp: 24.hours.from_now.to_i }
-      token = JWT.encode(payload, Rails.application.secret_key_base, 'HS256')
+      token = JWT.encode({ user_id: user.id }, Rails.application.secret_key_base)
+      # Set JWT as a secure, httpOnly cookie for auth#logged_in
+      cookies[:jwt] = {
+        value: token,
+        httponly: true,
+        secure: Rails.env.production?,
+        same_site: :lax,
+        expires: 1.day.from_now
+      }
       render json: { token: token, user: user.as_json(only: [:id, :email, :admin]) }, status: :ok
     else
-      render json: { error: "Invalid email or password" }, status: :unauthorized
+      render json: { error: "Email or password was invalid" }, status: :unauthorized
     end
+  end
+
+  # DELETE /api/logout
+  def destroy
+    cookies.delete(:jwt, httponly: true, secure: Rails.env.production?, same_site: :lax)
+    head :no_content
+  end
+
+  # GET /private/auth (JWT session check for nginx)
+  def logged_in
+    head @current_user ? :ok : :unauthorized
+  end
+
+  private
+
+  def jwt_token
+    cookies[:jwt]
   end
 end

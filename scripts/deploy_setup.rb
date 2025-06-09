@@ -6,7 +6,8 @@ require 'time'
 DEPLOY_DIR = '/opt/claqradio/radio-backend/'
 RELEASES_DIR = File.join(DEPLOY_DIR, 'releases')
 CURRENT_SYMLINK = File.join(DEPLOY_DIR, 'current')
-NEXT_SYMLINK = File.join(DEPLOY_DIR, 'next')
+NEXT_DIR = File.join(DEPLOY_DIR, 'next')
+PREVIOUS_SYMLINK = File.join(DEPLOY_DIR, 'previous')
 KEEP_RELEASES = 5
 
 FileUtils.mkdir_p(RELEASES_DIR)
@@ -36,12 +37,28 @@ puts "Cleanup complete. Retained the five most recent and the current directory.
 timestamp = Time.now.utc.strftime('%Y%m%d%H%M%S')
 new_release_dir = File.join(RELEASES_DIR, timestamp)
 
-FileUtils.mkdir_p(new_release_dir)
-puts "Created new release directory: #{new_release_dir}"
-
-if File.exist?(NEXT_SYMLINK)
-  FileUtils.rm(NEXT_SYMLINK)
+# Move the extracted artifact directory into the new release directory
+tmp_extract_dir = File.join(NEXT_DIR, "tmp")
+if File.directory?(tmp_extract_dir)
+  FileUtils.mv(tmp_extract_dir, new_release_dir)
+  puts "Moved #{tmp_extract_dir} to #{new_release_dir}"
+else
+  puts "ERROR: Expected artifact extraction directory #{tmp_extract_dir} does not exist."
 end
-FileUtils.ln_s(new_release_dir, NEXT_SYMLINK)
-puts "Updated 'next' symlink to: #{new_release_dir}"
 
+if File.exist?(CURRENT_SYMLINK)
+  if File.exist?(PREVIOUS_SYMLINK)
+    FileUtils.rm(PREVIOUS_SYMLINK)
+  end
+  FileUtils.ln_s(File.readlink(CURRENT_SYMLINK), PREVIOUS_SYMLINK)
+  puts "Updated 'previous' symlink to: #{File.readlink(CURRENT_SYMLINK)}"
+  FileUtils.rm(CURRENT_SYMLINK)
+end
+
+FileUtils.ln_s(new_release_dir, CURRENT_SYMLINK)
+puts "Updated 'current' symlink to: #{new_release_dir}"
+
+# Restart the backend service
+puts "Restarting claqradio-backend.service..."
+system("sudo systemctl restart claqradio-backend.service")
+puts "Service restarted."

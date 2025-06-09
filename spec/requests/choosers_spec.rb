@@ -34,14 +34,6 @@ RSpec.describe "/choosers", type: :request do
     end
   end
 
-  describe "GET /edit" do
-    it "renders a successful response" do
-      chooser = create(:chooser)
-      get edit_stream_chooser_url(chooser.stream, chooser)
-      expect(response).to be_successful
-    end
-  end
-
   describe "PATCH /update" do
     context "with valid parameters" do
       let(:new_attributes) {

@@ -1,35 +1,30 @@
 class ChoosersController < ApplicationController
-  before_action :set_chooser, only: %i[ show edit update ]
+  skip_before_action :authenticate_request, only: [:index, :show]
+
+  before_action :set_chooser, only: %i[ show update ]
   before_action :set_stream
 
-  # GET /choosers or /choosers.json
+  # GET /choosers.json
   def index
     @choosers = @stream.choosers.includes(:song)
+    render :index
   end
 
-  # GET /choosers/1 or /choosers/1.json
+  # GET /choosers/1.json
   def show
+    render :show
   end
 
-  # GET /choosers/1/edit
-  def edit
-  end
-
-  # PATCH/PUT /choosers/1 or /choosers/1.json
+  # PATCH/PUT /choosers/1.json
   def update
-    respond_to do |format|
-      if @chooser.update(chooser_params)
-        format.html { redirect_to stream_chooser_url(@stream, @chooser), notice: "Chooser was successfully updated." }
-        format.json { render :show, status: :ok, location: @chooser }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @chooser.errors, status: :unprocessable_entity }
-      end
+    if @chooser.update(chooser_params)
+      render :show, status: :ok, location: @chooser
+    else
+      render json: @chooser.errors, status: :unprocessable_entity
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_chooser
       @chooser = Chooser.find(params[:id])
     end
@@ -38,7 +33,6 @@ class ChoosersController < ApplicationController
       @stream = Stream.find(params[:stream_id])
     end
 
-    # Only allow a list of trusted parameters through.
     def chooser_params
       params.require(:chooser).permit(:song_id, :stream_id, :featured, :rating)
     end
