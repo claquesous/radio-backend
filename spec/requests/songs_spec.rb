@@ -20,6 +20,15 @@ RSpec.describe "/songs", type: :request do
       get songs_url
       expect(response).to be_successful
     end
+
+    it "queries by title" do
+      create(:song, title: 'abc')
+      create(:song, title: 'xyz')
+
+      get songs_url, params: { query: 'abc' }
+      expect(response.body).to include('abc')
+      expect(response.body).to_not include('xyz')
+    end
   end
 
   describe "GET /show" do
@@ -99,52 +108,6 @@ RSpec.describe "/songs", type: :request do
           expect(response.body).to include("Artist does not exist")
         end
       end
-    end
-
-    context "with invalid parameters" do
-      it "does not create a new Song" do
-        expect {
-          post songs_url, params: { song: invalid_attributes }
-        }.to change(Song, :count).by(0)
-      end
-
-      it "renders a response with 422 status (i.e. to display the 'new' template)" do
-        post songs_url, params: { song: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
-    end
-  end
-
-  describe "PATCH /update" do
-    context "with valid parameters" do
-      let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
-      }
-
-      it "updates the requested song" do
-        song = create(:song)
-        patch song_url(song), params: { song: new_attributes }
-        song.reload
-        skip("Add assertions for updated state")
-      end
-
-      it "redirects to the song" do
-        song = create(:song)
-        patch song_url(song), params: { song: new_attributes }
-        song.reload
-        expect(response).to redirect_to(song_url(song))
-      end
-    end
-
-    context "with invalid parameters" do
-
-      it "renders a response with 422 status (i.e. to display the 'edit' template)" do
-        song = create(:song)
-        patch song_url(song), params: { song: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
     end
   end
 end

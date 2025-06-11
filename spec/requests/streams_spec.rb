@@ -18,56 +18,24 @@ RSpec.describe "/streams", type: :request do
   # Stream. As you add validations to Stream, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
-  }
-
-  let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+    attributes_for(:stream)
   }
 
   describe "GET /index" do
     it "renders a successful response" do
-      Stream.create! valid_attributes
+      create(:stream)
       get streams_url
-      expect(response).to be_successful
-    end
-  end
-
-  describe "GET /show" do
-    it "renders a successful response" do
-      stream = Stream.create! valid_attributes
-      get stream_url(stream)
       expect(response).to be_successful
     end
   end
 
   describe "POST /create" do
     context "with valid parameters" do
-      it "creates a new Stream" do
+      it "creates a new Stream", :as_logged_in_user do
         expect {
           post streams_url, params: { stream: valid_attributes }
         }.to change(Stream, :count).by(1)
       end
-
-      it "redirects to the created stream" do
-        post streams_url, params: { stream: valid_attributes }
-        expect(response).to redirect_to(stream_url(Stream.last))
-      end
-    end
-
-    context "with invalid parameters" do
-      it "does not create a new Stream" do
-        expect {
-          post streams_url, params: { stream: invalid_attributes }
-        }.to change(Stream, :count).by(0)
-      end
-
-
-      it "renders a response with 422 status (i.e. to display the 'new' template)" do
-        post streams_url, params: { stream: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
     end
   end
 
@@ -83,47 +51,26 @@ RSpec.describe "/streams", type: :request do
 
     context "with valid parameters" do
       let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
+        {
+          name: "NewName"
+        }
       }
 
-      it "updates the requested stream" do
-        stream = Stream.create! valid_attributes
+      it "updates the requested stream", :as_logged_in_user do
+        stream = create(:stream, user: @logged_in_user)
         patch stream_url(stream), params: { stream: new_attributes }
         stream.reload
-        skip("Add assertions for updated state")
+        expect(response).to be_successful
       end
-
-      it "redirects to the stream" do
-        stream = Stream.create! valid_attributes
-        patch stream_url(stream), params: { stream: new_attributes }
-        stream.reload
-        expect(response).to redirect_to(stream_url(stream))
-      end
-    end
-
-    context "with invalid parameters" do
-
-      it "renders a response with 422 status (i.e. to display the 'edit' template)" do
-        stream = Stream.create! valid_attributes
-        patch stream_url(stream), params: { stream: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
     end
   end
 
   describe "DELETE /destroy" do
-    it "destroys the requested stream" do
-      stream = Stream.create! valid_attributes
+    it "destroys the requested stream", :as_logged_in_user do
+      stream = create(:stream, user: @logged_in_user)
       expect {
         delete stream_url(stream)
       }.to change(Stream, :count).by(-1)
-    end
-
-    it "redirects to the streams list" do
-      stream = Stream.create! valid_attributes
-      delete stream_url(stream)
-      expect(response).to redirect_to(streams_url)
     end
   end
 end
