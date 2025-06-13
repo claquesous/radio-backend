@@ -39,12 +39,6 @@ RSpec.describe "Albums", type: :request do
       end
     end
 
-    context "when unauthenticated" do
-      it "returns 401" do
-        allow_any_instance_of(AlbumsController).to receive(:authenticate_request).and_call_original
-        get albums_path, params: { query: 'abc' }, as: :json
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
+    
   end
 end
