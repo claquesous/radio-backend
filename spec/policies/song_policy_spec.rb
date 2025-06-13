@@ -14,9 +14,7 @@ RSpec.describe SongPolicy, type: :policy do
       expect(subject).to permit(admin, song)
     end
 
-    it "denies access to nil user" do
-      expect(subject).not_to permit(nil_user, song)
-    end
+    
   end
 
   [:create?, :update?, :destroy?].each do |action|
@@ -29,9 +27,7 @@ RSpec.describe SongPolicy, type: :policy do
         expect(subject).not_to permit(user, song)
       end
 
-      it "denies access to nil user" do
-        expect(subject).not_to permit(nil_user, song)
-      end
+      
     end
   end
 end

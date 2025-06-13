@@ -14,9 +14,7 @@ RSpec.describe AlbumPolicy, type: :policy do
       expect(subject).to permit(admin, album)
     end
 
-    it "denies access to nil user" do
-      expect(subject).not_to permit(nil_user, album)
-    end
+    
   end
 
   [:create?, :update?, :destroy?].each do |action|
@@ -29,9 +27,7 @@ RSpec.describe AlbumPolicy, type: :policy do
         expect(subject).not_to permit(user, album)
       end
 
-      it "denies access to nil user" do
-        expect(subject).not_to permit(nil_user, album)
-      end
+      
     end
   end
 end

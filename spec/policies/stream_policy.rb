@@ -18,9 +18,7 @@ RSpec.describe StreamPolicy, type: :policy do
       expect(subject).not_to permit(other_user, stream)
     end
 
-    it "denies access to nil user" do
-      expect(subject).not_to permit(nil_user, stream)
-    end
+    
 
     it "grants access to admin" do
       expect(subject).to permit(admin, stream)

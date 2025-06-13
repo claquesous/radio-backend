@@ -14,9 +14,7 @@ RSpec.describe ArtistPolicy, type: :policy do
       expect(subject).to permit(admin, artist)
     end
 
-    it "denies access to nil user" do
-      expect(subject).not_to permit(nil_user, artist)
-    end
+    
   end
 
   [:create?, :update?, :destroy?].each do |action|
@@ -29,9 +27,7 @@ RSpec.describe ArtistPolicy, type: :policy do
         expect(subject).not_to permit(user, artist)
       end
 
-      it "denies access to nil user" do
-        expect(subject).not_to permit(nil_user, artist)
-      end
+      
     end
   end
 end

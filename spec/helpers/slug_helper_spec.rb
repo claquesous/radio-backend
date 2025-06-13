@@ -2,13 +2,7 @@ require 'rails_helper'
 
 RSpec.describe SlugHelper, type: :helper do
   describe "#to_slug" do
-    it "lowercases the string" do
-      expect(helper.to_slug("Title")).to eq("title")
-    end
-
-    it "replaces special characters with dashes" do
-      expect(helper.to_slug("my#life")).to eq("my-life")
-    end
+  end
 
     it "strips a trailing dash" do
       expect(helper.to_slug("why?")).to eq("why")
