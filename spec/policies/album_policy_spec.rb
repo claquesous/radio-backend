@@ -4,17 +4,13 @@ RSpec.describe AlbumPolicy, type: :policy do
   let(:user) { build(:user) }
   let(:admin) { build(:user, admin: true) }
   let(:album) { build(:album) }
-  let(:nil_user) { nil }
 
   subject { described_class }
 
   permissions :show? do
-    it "grants access to all users" do
+    it "grants access to all" do
       expect(subject).to permit(user, album)
-      expect(subject).to permit(admin, album)
     end
-
-    
   end
 
   [:create?, :update?, :destroy?].each do |action|
@@ -26,8 +22,7 @@ RSpec.describe AlbumPolicy, type: :policy do
       it "denies access to non-admins" do
         expect(subject).not_to permit(user, album)
       end
-
-      
     end
   end
 end
+

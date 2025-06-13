@@ -2,15 +2,16 @@ require 'rails_helper'
 
 RSpec.describe Play, type: :model do
   describe "associations" do
-    
-    
-    
-    
+    it { should belong_to(:song) }
+    it { should belong_to(:artist) }
+    it { should belong_to(:stream).optional }
+    it { should have_many(:ratings) }
+    it { should have_many(:requests) }
   end
 
   describe "validations" do
-    
-    
+    it { should validate_presence_of(:song) }
+    it { should validate_presence_of(:artist) }
   end
 
   describe "#resolve_requests" do
@@ -48,6 +49,13 @@ RSpec.describe Play, type: :model do
       expect(request2.played).to be true
     end
 
-    
+    it "does not mark previously played songs as played" do
+      old_play = create(:play, stream: stream, song: song)
+      request = create(:request, stream: stream, song: song, played: true, play: old_play)
+      new_play = request.stream.next_play
+      new_play.save!
+      request.reload
+      expect(request.play).to eq(old_play)
+    end
   end
 end
