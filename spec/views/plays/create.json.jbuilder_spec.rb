@@ -10,4 +10,22 @@ RSpec.describe "plays/create", type: :view do
     expect(rendered).to match(@play.song.title)
     expect(rendered).to match(@play.artist.name)
   end
+
+  it "renders gracefully if artist is missing" do
+    @play.song.artist = nil
+    @play.song.save!
+    render
+    expect(rendered).to match(@play.song.title)
+  end
+
+  it "renders gracefully if song is missing" do
+    @play.song = nil
+    render
+    expect(rendered).not_to match(/.+/)
+  end
+
+  it "renders valid JSON" do
+    render
+    expect { JSON.parse(rendered) }.not_to raise_error
+  end
 end

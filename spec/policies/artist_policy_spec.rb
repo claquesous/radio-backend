@@ -4,12 +4,18 @@ RSpec.describe ArtistPolicy, type: :policy do
   let(:user) { build(:user) }
   let(:admin) { build(:user, admin: true) }
   let(:artist) { build(:artist) }
+  let(:nil_user) { nil }
 
   subject { described_class }
 
   permissions :show? do
-    it "grants access to all" do
+    it "grants access to all users" do
       expect(subject).to permit(user, artist)
+      expect(subject).to permit(admin, artist)
+    end
+
+    it "denies access to nil user" do
+      expect(subject).not_to permit(nil_user, artist)
     end
   end
 
@@ -22,7 +28,10 @@ RSpec.describe ArtistPolicy, type: :policy do
       it "denies access to non-admins" do
         expect(subject).not_to permit(user, artist)
       end
+
+      it "denies access to nil user" do
+        expect(subject).not_to permit(nil_user, artist)
+      end
     end
   end
 end
-

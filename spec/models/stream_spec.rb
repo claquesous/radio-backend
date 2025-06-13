@@ -1,6 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe Stream, type: :model do
+  describe "associations" do
+    it { should belong_to(:user).optional }
+    it { should have_many(:plays) }
+    it { should have_many(:requests) }
+    it { should have_many(:choosers) }
+  end
+
+  describe "validations" do
+    it { should validate_presence_of(:name) }
+  end
+
   let(:stream) { create(:stream) }
 
   describe "#next_play" do
@@ -9,14 +20,14 @@ RSpec.describe Stream, type: :model do
       stream.choosers = create_list(:chooser, 5) do |chooser, i|
         chooser.rating = 99
       end
-      expect(stream.next_play.song.id).to equal(request.song.id)
+      expect(stream.next_play.song.id).to eq(request.song.id)
     end
 
     it "returns songs with high ratings" do
       song = create(:song)
       stream.choosers = create_list(:chooser, 5) do |chooser, i|
-        chooser.rating = i*20
-        chooser.song = song if i==4
+        chooser.rating = i * 20
+        chooser.song = song if i == 4
       end
 
       allow(Random).to receive(:rand).and_wrap_original do |original_method, *args|
@@ -28,7 +39,7 @@ RSpec.describe Stream, type: :model do
         end
       end
 
-      expect(stream.next_play.song.id).to equal(song.id)
+      expect(stream.next_play.song.id).to eq(song.id)
     end
 
     it "limits repeat artists" do
@@ -39,8 +50,8 @@ RSpec.describe Stream, type: :model do
       create_list(:song, 4, artist: artist)
       new_song = create(:chooser, rating: 5).song
 
-      expect(stream.choosers.count).to equal(6)
-      expect(stream.next_play.song.id).to equal(new_song.id)
+      expect(stream.choosers.count).to eq(6)
+      expect(stream.next_play.song.id).to eq(new_song.id)
     end
 
     it "limits repeat songs" do
@@ -49,8 +60,8 @@ RSpec.describe Stream, type: :model do
       stream.plays.create(song: song)
       new_song = create(:chooser, rating: 5).song
 
-      expect(stream.choosers.count).to equal(2)
-      expect(stream.next_play.song.id).to equal(new_song.id)
+      expect(stream.choosers.count).to eq(2)
+      expect(stream.next_play.song.id).to eq(new_song.id)
     end
   end
 end
