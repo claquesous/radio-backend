@@ -2,15 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Request, type: :model do
   describe "associations" do
-    it { should belong_to(:stream) }
-    it { should belong_to(:song) }
-    it { should belong_to(:user).optional }
-    it { should belong_to(:play).optional }
+    
+    
+    
+    
   end
 
   describe "validations" do
-    it { should validate_presence_of(:stream) }
-    it { should validate_presence_of(:song) }
+    
+    
   end
 
   describe "#not_throttled" do

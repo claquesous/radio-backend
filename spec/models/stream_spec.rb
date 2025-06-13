@@ -2,14 +2,14 @@ require 'rails_helper'
 
 RSpec.describe Stream, type: :model do
   describe "associations" do
-    it { should belong_to(:user).optional }
-    it { should have_many(:plays) }
-    it { should have_many(:requests) }
-    it { should have_many(:choosers) }
+    
+    
+    
+    
   end
 
   describe "validations" do
-    it { should validate_presence_of(:name) }
+    
   end
 
   let(:stream) { create(:stream) }

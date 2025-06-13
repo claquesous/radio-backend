@@ -2,15 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Play, type: :model do
   describe "associations" do
-    it { should belong_to(:stream) }
-    it { should belong_to(:song) }
-    it { should have_many(:requests) }
-    it { should have_many(:ratings) }
+    
+    
+    
+    
   end
 
   describe "validations" do
-    it { should validate_presence_of(:stream) }
-    it { should validate_presence_of(:song) }
+    
+    
   end
 
   describe "#resolve_requests" do

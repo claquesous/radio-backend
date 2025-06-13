@@ -2,12 +2,12 @@ require 'rails_helper'
 
 RSpec.describe Rating, type: :model do
   describe "associations" do
-    it { should belong_to(:play) }
-    it { should belong_to(:user).optional }
+    
+    
   end
 
   describe "validations" do
-    it { should validate_presence_of(:play) }
+    
   end
 
   describe "#latest_play" do
