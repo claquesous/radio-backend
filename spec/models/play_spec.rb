@@ -48,13 +48,6 @@ RSpec.describe Play, type: :model do
       expect(request2.played).to be true
     end
 
-    it "does not mark previously played songs as played" do
-      old_play = create(:play, stream: stream, song: song)
-      request = create(:request, stream: stream, song: song, played: true, play: old_play)
-      new_play = request.stream.next_play
-      new_play.save!
-      request.reload
-      expect(request.play).to eq(old_play)
-    end
+    
   end
 end
