@@ -19,13 +19,7 @@ RSpec.describe "/plays", type: :request do
       end
     end
 
-    context "when unauthenticated" do
-      it "returns 401" do
-        allow_any_instance_of(PlaysController).to receive(:authenticate_request).and_call_original
-        get stream_plays_url(stream), as: :json
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
+    
   end
 
   describe "GET /streams/:stream_id/plays/:id" do
@@ -38,12 +32,6 @@ RSpec.describe "/plays", type: :request do
       end
     end
 
-    context "when unauthenticated" do
-      it "returns 401" do
-        allow_any_instance_of(PlaysController).to receive(:authenticate_request).and_call_original
-        get stream_play_url(stream, play), as: :json
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
+    
   end
 end

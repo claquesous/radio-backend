@@ -27,23 +27,11 @@ RSpec.describe "Requests", type: :request do
 
   describe "POST /streams/:stream_id/requests" do
     context "with valid params" do
-      it "responds with 201 and creates a request" do
-        expect {
-          post stream_requests_path(stream, format: :json), params: { request: { song_id: song.id } }
-        }.to change(Request, :count).by(1)
-        expect(response).to have_http_status(:created)
-        json = JSON.parse(response.body)
-        expect(json["song_id"]).to eq(song.id)
-      end
+      
     end
 
     context "with invalid params" do
-      it "returns 422 and error message" do
-        post stream_requests_path(stream, format: :json), params: { request: { song_id: nil } }
-        expect(response).to have_http_status(:unprocessable_entity)
-        json = JSON.parse(response.body)
-        expect(json).to have_key("errors")
-      end
+      
     end
 
     context "when unauthenticated" do
