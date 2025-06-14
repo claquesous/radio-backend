@@ -8,8 +8,9 @@ RSpec.describe AlbumPolicy, type: :policy do
   subject { described_class }
 
   permissions :show? do
-    it "grants access to all" do
+    it "grants access to all users" do
       expect(subject).to permit(user, album)
+      expect(subject).to permit(admin, album)
     end
   end
 
@@ -25,4 +26,3 @@ RSpec.describe AlbumPolicy, type: :policy do
     end
   end
 end
-

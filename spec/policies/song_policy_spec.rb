@@ -8,8 +8,9 @@ RSpec.describe SongPolicy, type: :policy do
   subject { described_class }
 
   permissions :show? do
-    it "grants access to all" do
+    it "grants access to all users" do
       expect(subject).to permit(user, song)
+      expect(subject).to permit(admin, song)
     end
   end
 
