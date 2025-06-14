@@ -1,14 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "Artists", type: :request do
-  let!(:artist_abc) { create(:artist, name: 'abc') }
-  let!(:artist_xyz) { create(:artist, name: 'xyz') }
-
-  before do
-    allow_any_instance_of(ArtistsController).to receive(:authenticate_request)
-  end
-
   describe "GET /artists" do
+    let!(:artist_abc) { create(:artist, name: 'abc') }
+    let!(:artist_xyz) { create(:artist, name: 'xyz') }
+
     context "when querying by name" do
       it "returns matching artists in JSON" do
         get artists_url, params: { query: 'abc' }, as: :json
@@ -38,7 +34,5 @@ RSpec.describe "Artists", type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
-
-    
   end
 end

@@ -1,17 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Stream, type: :model do
-  describe "associations" do
-    
-    
-    
-    
-  end
-
-  describe "validations" do
-    
-  end
-
   let(:stream) { create(:stream) }
 
   describe "#next_play" do

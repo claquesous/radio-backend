@@ -1,15 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Rating, type: :model do
-  describe "associations" do
-    
-    
-  end
-
-  describe "validations" do
-    
-  end
-
   describe "#latest_play" do
     it "doesn't allow ratings for earlier plays" do
       earlier = create(:play)

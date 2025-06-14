@@ -22,7 +22,11 @@ RSpec.describe "/streams", type: :request do
   }
 
   describe "GET /index" do
-    it "renders a successful response" do
+    it "renders a successful response", :as_logged_in_user do
+      allow_any_instance_of(ApplicationController).to receive(:current_user) do
+        @_spec_current_user ||= create(:user)
+      end
+
       create(:stream)
       get streams_url
       expect(response).to be_successful

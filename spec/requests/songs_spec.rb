@@ -65,18 +65,18 @@ RSpec.describe "/songs", type: :request do
           allow_any_instance_of(Aws::S3::Object).to receive(:upload_file)
         end
 
-        it "creates a new Song" do
+        it "creates a new Song", :as_logged_in_admin do
           expect {
             post songs_url, params: { song: valid_attributes_with_file }
           }.to change(Song, :count).by(1)
         end
 
-        it "responds with 201" do
+        it "responds with 201", :as_logged_in_admin do
           post songs_url, params: { song: valid_attributes_with_file }
           expect(response).to be_created
         end
 
-        it "uploads the file to s3" do
+        it "uploads the file to s3", :as_logged_in_admin do
           expect_any_instance_of(Aws::S3::Object).to receive(:upload_file)
           post songs_url, params: { song: valid_attributes_with_file }
         end
@@ -89,13 +89,13 @@ RSpec.describe "/songs", type: :request do
             ))
           end
 
-          it "uses the correct existing artist" do
+          it "uses the correct existing artist", :as_logged_in_admin do
             expect {
               post songs_url, params: { song: valid_attributes_with_file }
             }.to change(@artist.songs, :count).by(1)
           end
 
-          it "sets an artist name override" do
+          it "sets an artist name override", :as_logged_in_user do
             post songs_url, params: { song: valid_attributes_with_file }
             expect(Song.last.artist_name_override).to eq('artist f./Claq')
           end
@@ -103,7 +103,7 @@ RSpec.describe "/songs", type: :request do
       end
 
       context "without existing artist" do
-        it "responds with an error message" do
+        it "responds with an error message", :as_logged_in_admin do
           post songs_url, params: { song: valid_attributes_with_file }
           expect(response.body).to include("Artist does not exist")
         end

@@ -11,10 +11,6 @@ RSpec.describe "plays/create", type: :view do
     expect(rendered).to match(@play.artist.name)
   end
 
-  
-
-  
-
   it "renders valid JSON" do
     render
     expect { JSON.parse(rendered) }.not_to raise_error

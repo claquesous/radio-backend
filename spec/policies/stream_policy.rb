@@ -5,7 +5,6 @@ RSpec.describe StreamPolicy, type: :policy do
   let(:admin) { build(:user, admin: true) }
   let(:stream) { build(:stream, user: user) }
   let(:other_user) { build(:user) }
-  let(:nil_user) { nil }
 
   subject { described_class }
 
@@ -17,8 +16,6 @@ RSpec.describe StreamPolicy, type: :policy do
     it "denies access if stream is owned by another user" do
       expect(subject).not_to permit(other_user, stream)
     end
-
-    
 
     it "grants access to admin" do
       expect(subject).to permit(admin, stream)

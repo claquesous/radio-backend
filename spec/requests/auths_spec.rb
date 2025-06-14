@@ -42,7 +42,13 @@ RSpec.describe "Auths", type: :request do
   end
 
   describe "GET /private/auth" do
-    
+    context "when logged in" do
+      it "returns 200" do
+        post "/api/login", params: { email: user.email, password: "password123" }, as: :json
+        get "/private/auth", headers: { "Cookie" => "jwt=#{response.cookies['jwt']}" }
+        expect(response).to have_http_status(:ok)
+      end
+    end
 
     context "when not logged in" do
       it "returns 401" do

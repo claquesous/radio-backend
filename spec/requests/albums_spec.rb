@@ -1,14 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "Albums", type: :request do
-  let!(:album_abc) { create(:album, title: 'abc') }
-  let!(:album_xyz) { create(:album, title: 'xyz') }
-
-  before do
-    allow_any_instance_of(AlbumsController).to receive(:authenticate_request)
-  end
-
   describe "GET /albums" do
+    let!(:album_abc) { create(:album, title: 'abc') }
+    let!(:album_xyz) { create(:album, title: 'xyz') }
+
     context "when querying by title" do
       it "returns matching albums in JSON" do
         get albums_path, params: { query: 'abc' }, as: :json
@@ -38,7 +34,5 @@ RSpec.describe "Albums", type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
-
-    
   end
 end
