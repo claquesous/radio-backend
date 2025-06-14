@@ -277,6 +277,8 @@ GEM
     rspec-support (3.13.4)
     ruby-mp3info (0.8.10)
     securerandom (0.4.1)
+    shoulda-matchers (6.5.0)
+      activesupport (>= 5.2.0)
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
@@ -317,6 +319,7 @@ DEPENDENCIES
   rails (~> 8.0.2)
   rspec-rails
   ruby-mp3info
+  shoulda-matchers (~> 6.0)
   sorcery
   tzinfo-data
 

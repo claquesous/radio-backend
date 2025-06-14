@@ -2,6 +2,7 @@ class Play < ApplicationRecord
   belongs_to :stream
   belongs_to :song
   has_one :artist, through: :song
+  has_many :requests
   has_one :album, through: :song
   has_many :ratings
   default_scope {order(id: :desc)}

@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Stream, type: :model do
+  subject { build(:stream) }
+  it { should have_many(:plays) }
+  it { should have_many(:requests) }
+
   let(:stream) { create(:stream) }
 
   describe "#next_play" do

@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe Play, type: :model do
+  subject { build(:play) }
+  it { should belong_to(:song) }
+  it { should belong_to(:stream) }
+  it { should have_many(:ratings) }
+  it { should have_many(:requests) }
+
   describe "#resolve_requests" do
     it "marks requests as played" do
       request = create(:request)

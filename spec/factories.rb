@@ -48,6 +48,20 @@ FactoryBot.define do
     sequence(:email) { |n| "user#{n}@example.org" }
     password { "passw0rd" }
     admin { false }
+
+    after(:build) do |user|
+      # Skip the set_initial_admin callback for test users
+      user.define_singleton_method(:set_initial_admin) { }
+    end
+
+    factory :user_with_callback do
+      admin { nil }
+
+      after(:build) do |user|
+        # Allow the original callback to run
+        user.singleton_class.send(:remove_method, :set_initial_admin) if user.respond_to?(:set_initial_admin)
+      end
+    end
   end
 
   factory :stream do
