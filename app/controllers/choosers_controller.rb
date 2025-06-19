@@ -7,6 +7,21 @@ class ChoosersController < ApplicationController
   # GET /choosers.json
   def index
     @choosers = @stream.choosers.includes(:song)
+
+    if params[:featured].present?
+      featured_value = params[:featured] == 'true'
+      @choosers = @choosers.where(featured: featured_value)
+    end
+
+    if params[:sort].present? && params[:sort] == 'created_at'
+      @choosers = @choosers.order(created_at: :desc)
+    end
+
+    if params[:limit].present?
+      limit_value = params[:limit].to_i
+      @choosers = @choosers.limit(limit_value) if limit_value > 0
+    end
+
     render :index
   end
 
