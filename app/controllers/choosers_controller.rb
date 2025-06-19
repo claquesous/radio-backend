@@ -34,6 +34,6 @@ class ChoosersController < ApplicationController
     end
 
     def chooser_params
-      params.require(:chooser).permit(:song_id, :stream_id, :featured, :rating)
+      params.require(:chooser).permit(:featured, :rating)
     end
 end
