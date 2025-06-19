@@ -5,7 +5,7 @@ class ChoosersController < ApplicationController
 
   # GET /choosers.json
   def index
-    @choosers = @stream.choosers.where(stream: @stream).includes(:song)
+    @choosers = @stream.choosers.where(stream: @stream).includes(:song).includes(song: :artist)
 
     if params[:featured].present?
       featured_value = params[:featured] == 'true'
@@ -16,7 +16,6 @@ class ChoosersController < ApplicationController
       @choosers = @choosers.unscoped.order(created_at: :desc)
     end
 
-    # Handle pagination parameters
     total_count = nil
     limit_value = nil
     offset_value = nil
@@ -53,7 +52,7 @@ class ChoosersController < ApplicationController
   def update
     @chooser = Chooser.find(params[:id])
     if @chooser.update(chooser_params)
-      render :show, status: :ok, location: @chooser
+      render :show, status: :ok
     else
       render json: @chooser.errors, status: :unprocessable_entity
     end
