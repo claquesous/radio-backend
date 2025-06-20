@@ -57,4 +57,67 @@ RSpec.describe Stream, type: :model do
       expect(stream.next_play.song.id).to eq(new_song.id)
     end
   end
+
+  describe "validations" do
+    it "does not allow enabled to be true on create" do
+      stream = build(:stream, enabled: true)
+      expect(stream).not_to be_valid
+      expect(stream.errors[:enabled]).to include("cannot be true at creation")
+    end
+
+    it "does not allow destroy if enabled is true" do
+      stream = create(:stream, enabled: false)
+      stream.update(enabled: true)
+      expect { stream.destroy }.not_to change(Stream, :count)
+      expect(stream.errors[:base]).to include("Cannot destroy an enabled stream")
+    end
+  end
+
+  describe "event publishing" do
+    let(:stream) { create(:stream, enabled: false) }
+
+    before do
+      allow(StreamEventPublisher).to receive(:publish)
+    end
+
+    it "publishes stream_created when enabled goes from false to true" do
+      stream.update(enabled: true)
+      expect(StreamEventPublisher).to have_received(:publish).with(:stream_created, stream)
+    end
+
+    it "publishes stream_destroyed when enabled goes from true to false" do
+      stream.update(enabled: true)
+      stream.update(enabled: false)
+      expect(StreamEventPublisher).to have_received(:publish).with(:stream_destroyed, stream)
+    end
+
+    it "publishes stream_updated when name changes for enabled stream" do
+      stream.update(enabled: true)
+      stream.update(name: "New Name")
+      expect(StreamEventPublisher).to have_received(:publish).with(:stream_updated, stream)
+    end
+
+    it "publishes stream_updated when premium changes for enabled stream" do
+      stream.update(enabled: true)
+      stream.update(premium: true)
+      expect(StreamEventPublisher).to have_received(:publish).with(:stream_updated, stream)
+    end
+
+    it "publishes stream_updated when description changes for enabled stream" do
+      stream.update(enabled: true)
+      stream.update(description: "desc")
+      expect(StreamEventPublisher).to have_received(:publish).with(:stream_updated, stream)
+    end
+
+    it "publishes stream_updated when genre changes for enabled stream" do
+      stream.update(enabled: true)
+      stream.update(genre: "rock")
+      expect(StreamEventPublisher).to have_received(:publish).with(:stream_updated, stream)
+    end
+
+    it "does not publish stream_updated when attributes change for disabled stream" do
+      stream.update(name: "Other")
+      expect(StreamEventPublisher).not_to have_received(:publish).with(:stream_updated, stream)
+    end
+  end
 end
