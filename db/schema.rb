@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_09_231203) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_21_012549) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "albums", id: :serial, force: :cascade do |t|
     t.integer "artist_id"
@@ -118,6 +118,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_09_231203) do
     t.string "mastodon_url"
     t.float "default_rating", default: 50.0, null: false
     t.boolean "default_featured", default: false, null: false
+    t.boolean "premium"
+    t.string "genre"
+    t.text "description"
+    t.boolean "enabled"
     t.index ["encrypted_mastodon_access_token_iv"], name: "index_streams_on_encrypted_mastodon_access_token_iv", unique: true
   end
 

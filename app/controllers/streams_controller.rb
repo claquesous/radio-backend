@@ -50,7 +50,21 @@ class StreamsController < ApplicationController
     end
 
     def stream_params
-      params.require(:stream).permit(:name, :default_rating, :default_featured, :mastodon_url, :mastodon_access_token)
+      permitted = params.require(:stream).permit(
+        :name,
+        :default_rating,
+        :default_featured,
+        :mastodon_url,
+        :mastodon_access_token,
+        :premium,
+        :genre,
+        :description,
+        :enabled
+      )
+      [:name, :genre, :description].each do |key|
+        permitted[key] = ERB::Util.html_escape(permitted[key]) if permitted[key]
+      end
+      permitted
     end
 
     def remove_blank_mastodon_access_token
