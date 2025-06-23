@@ -33,6 +33,33 @@ RSpec.describe "/streams", type: :request do
     end
   end
 
+  describe "GET /show" do
+    before(:each) do
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@logged_in_user)
+    end
+
+    it "renders fields private to the owner of the stream as owner", :as_logged_in_user do
+      stream = create(:stream, user: @logged_in_user)
+      get stream_url(stream)
+      json = JSON.parse(response.body)
+      expect(json).to have_key("default_rating")
+    end
+
+    it "does not render fields private to the owner of the stream as non-owner", :as_logged_in_user do
+      stream = create(:stream)
+      get stream_url(stream)
+      json = JSON.parse(response.body)
+      expect(json).not_to have_key("default_rating")
+    end
+
+    it "does not expose sensitive mastodon_access_token", :as_logged_in_user do
+      stream = create(:stream, user: @logged_in_user, mastodon_access_token: "secret")
+      get stream_url(stream)
+      json = JSON.parse(response.body)
+      expect(json).not_to have_key("mastodon_access_token")
+    end
+  end
+
   describe "POST /create" do
     context "with valid parameters" do
       it "creates a new Stream", :as_logged_in_user do
@@ -78,3 +105,4 @@ RSpec.describe "/streams", type: :request do
     end
   end
 end
+
