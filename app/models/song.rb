@@ -8,6 +8,8 @@ class Song < ApplicationRecord
   before_create :add_choosers
   default_scope { order(:sort) }
 
+  validates :title, presence: true
+
   def add_choosers
     Stream.all.each do |stream|
       choosers.build(stream: stream, rating: stream.default_rating, featured: stream.default_featured)

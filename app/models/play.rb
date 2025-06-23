@@ -2,9 +2,9 @@ class Play < ApplicationRecord
   belongs_to :stream
   belongs_to :song
   has_one :artist, through: :song
-  has_many :requests
   has_one :album, through: :song
   has_many :ratings
+  has_many :requests
   default_scope {order(id: :desc)}
   before_create :toot_song, :if => proc { Rails.env.production? }
   after_create :resolve_requests
