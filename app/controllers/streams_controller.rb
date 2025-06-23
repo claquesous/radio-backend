@@ -12,7 +12,6 @@ class StreamsController < ApplicationController
 
   # GET /streams/1.json
   def show
-    authorize @stream
     render :show
   end
 
