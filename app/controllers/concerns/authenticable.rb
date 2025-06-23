@@ -32,7 +32,12 @@ module Authenticable
   end
 
   def decode_jwt(token)
-    body = JWT.decode(token, Rails.application.secret_key_base)[0]
+    body = JWT.decode(
+      token,
+      Rails.application.secret_key_base,
+      true,
+      { algorithm: 'HS256', verify_expiration: true }
+    )[0]
     HashWithIndifferentAccess.new body
   end
 end

@@ -5,14 +5,15 @@ class AuthsController < ApplicationController
   def create
     user = login(params[:email], params[:password], params[:remember_me])
     if user
-      token = JWT.encode({ user_id: user.id }, Rails.application.secret_key_base)
+      exp = 5.days.from_now.to_i
+      token = JWT.encode({ user_id: user.id, exp: exp }, Rails.application.secret_key_base, 'HS256')
       # Set JWT as a secure, httpOnly cookie for auth#logged_in
       cookies[:jwt] = {
         value: token,
         httponly: true,
         secure: Rails.env.production?,
         same_site: :lax,
-        expires: 1.day.from_now
+        expires: Time.at(exp)
       }
       render json: { token: token, user: user.as_json(only: [:id, :email, :admin]) }, status: :ok
     else
