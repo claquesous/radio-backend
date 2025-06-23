@@ -5,6 +5,7 @@ require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'pundit/rspec'
+require 'shoulda/matchers'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -24,6 +25,13 @@ require 'pundit/rspec'
 # Checks for pending migrations before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.maintain_test_schema!
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
@@ -57,7 +65,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each, type: :request, as_logged_in_user: true) do
-    @logged_in_user = create(:user)
+    @logged_in_user = create(:user, admin: false)
     allow_any_instance_of(ApplicationController).to receive(:authenticate_with_jwt) do
       @_logged_in_user ||= @logged_in_user
     end

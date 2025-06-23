@@ -95,7 +95,7 @@ RSpec.describe "/songs", type: :request do
             }.to change(@artist.songs, :count).by(1)
           end
 
-          it "sets an artist name override", :as_logged_in_user do
+          it "sets an artist name override", :as_logged_in_admin do
             post songs_url, params: { song: valid_attributes_with_file }
             expect(Song.last.artist_name_override).to eq('artist f./Claq')
           end

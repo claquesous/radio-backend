@@ -5,4 +5,6 @@ class Artist < ApplicationRecord
   has_many :songs
   has_many :albums
   has_many :plays, through: :songs
+
+  validates :name, presence: true
 end

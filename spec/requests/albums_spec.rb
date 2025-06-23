@@ -35,4 +35,56 @@ RSpec.describe "Albums", type: :request do
       end
     end
   end
+
+  describe "POST /albums" do
+    let!(:artist) { create(:artist) }
+    let(:album_params) { { album: { artist_id: artist.id, title: "New Album" } } }
+
+    context "as an admin", as_logged_in_admin: true do
+      it "creates an album" do
+        post albums_path, params: album_params, as: :json
+        expect(response).to have_http_status(:created)
+      end
+    end
+
+    context "as a standard user", as_logged_in_user: true do
+      it "is unauthorized" do
+        post albums_path, params: album_params, as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when not logged in" do
+      it "is unauthorized" do
+        post albums_path, params: album_params, as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe "PATCH /albums/:id" do
+    let!(:album) { create(:album) }
+    let(:update_params) { { album: { title: "Updated Title" } } }
+
+    context "as an admin", as_logged_in_admin: true do
+      it "updates the album" do
+        patch album_path(album), params: update_params, as: :json
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "as a standard user", as_logged_in_user: true do
+      it "is unauthorized" do
+        patch album_path(album), params: update_params, as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when not logged in" do
+      it "is unauthorized" do
+        patch album_path(album), params: update_params, as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
 end
