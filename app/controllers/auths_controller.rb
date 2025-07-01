@@ -13,7 +13,7 @@ class AuthsController < ApplicationController
         httponly: true,
         secure: Rails.env.production?,
         same_site: :lax,
-        expires: Time.at(exp)
+        expires: Time.at(exp).utc.httpdate
       }
       render json: { token: token, user: user.as_json(only: [:id, :email, :admin]) }, status: :ok
     else
