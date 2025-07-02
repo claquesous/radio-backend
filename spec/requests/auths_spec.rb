@@ -21,8 +21,9 @@ RSpec.describe "Auths", type: :request do
 
       it "sets the JWT cookie with correct expires attribute" do
         post "/api/login", params: { email: user.email, password: "password123" }, as: :json
-        set_cookie = response.headers["Set-Cookie"]
-        expect(set_cookie).to match(/expires=\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT/)
+        set_cookies = Array(response.headers["Set-Cookie"])
+        jwt_cookie = set_cookies.find { |c| c.start_with?("jwt=") }
+        expect(jwt_cookie).to match(/expires=\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT/)
       end
     end
 
