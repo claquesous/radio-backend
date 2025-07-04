@@ -16,7 +16,7 @@ class StreamEventPublisher
       sqs_client.send_message({
         queue_url: queue_url,
         message_body: message.to_json,
-        message_group_id: stream.id
+        message_group_id: stream.id.to_s
       })
 
       Rails.logger.info "Published stream event: #{event_type} for stream #{stream.id}"
