@@ -5,6 +5,10 @@ class Stream < ApplicationRecord
   has_many :requests
   before_create :add_choosers
   validate :default_rating_in_range
+  validate :cannot_enable_on_create, on: :create
+  before_destroy :prevent_destroy_if_enabled
+
+  after_commit :publish_stream_events
 
   attr_encrypted :mastodon_access_token, key: ENV['MASTODON_ACCESS_TOKEN_KEY']
 
@@ -74,5 +78,31 @@ class Stream < ApplicationRecord
         errors.add(:default_rating, "must be from 0 to 100")
       end
     end
-end
 
+    def cannot_enable_on_create
+      if enabled
+        errors.add(:enabled, "cannot be true at creation")
+      end
+    end
+
+    def prevent_destroy_if_enabled
+      if enabled
+        errors.add(:base, "Cannot destroy an enabled stream")
+        throw(:abort)
+      end
+    end
+
+    def publish_stream_events
+      if saved_change_to_enabled?
+        if saved_change_to_enabled == [false, true]
+          StreamEventPublisher.publish(:stream_created, self)
+        elsif saved_change_to_enabled == [true, false]
+          StreamEventPublisher.publish(:stream_destroyed, self)
+        end
+      elsif enabled && (saved_change_to_name? || saved_change_to_premium? || saved_change_to_description? || saved_change_to_genre?)
+        StreamEventPublisher.publish(:stream_updated, self)
+      end
+    rescue => e
+      Rails.logger.error "Failed to publish stream event: #{e.message}"
+    end
+end

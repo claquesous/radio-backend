@@ -92,6 +92,9 @@ GEM
       aws-sdk-core (~> 3, >= 3.225.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
+    aws-sdk-sqs (1.96.0)
+      aws-sdk-core (~> 3, >= 3.225.0)
+      aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.0)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
@@ -306,6 +309,7 @@ PLATFORMS
 DEPENDENCIES
   attr_encrypted (~> 4.1.0)
   aws-sdk-s3 (~> 1.146, >= 1.146.1)
+  aws-sdk-sqs
   bootsnap (>= 1.4.4)
   byebug
   factory_bot_rails
