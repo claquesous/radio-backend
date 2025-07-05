@@ -51,7 +51,7 @@ RSpec.describe "Artists", type: :request do
         delete artist_path(artist), as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         json = JSON.parse(response.body)
-        expect(json["errors"]).to include("Cannot delete artist with songs")
+        expect(json["errors"]).to include("Cannot delete record because dependent songs exist")
         expect(Artist.exists?(artist.id)).to be true
       end
 
@@ -61,7 +61,7 @@ RSpec.describe "Artists", type: :request do
         delete artist_path(artist), as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         json = JSON.parse(response.body)
-        expect(json["errors"]).to include("Cannot delete artist with albums")
+        expect(json["errors"]).to include("Cannot delete record because dependent albums exist")
         expect(Artist.exists?(artist.id)).to be true
       end
     end

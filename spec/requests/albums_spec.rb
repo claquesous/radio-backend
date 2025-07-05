@@ -105,7 +105,7 @@ RSpec.describe "Albums", type: :request do
         delete album_path(album), as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         json = JSON.parse(response.body)
-        expect(json["errors"]).to include("Cannot delete album with songs")
+        expect(json["errors"]).to include("Cannot delete record because dependent songs exist")
         expect(Album.exists?(album.id)).to be true
       end
     end
