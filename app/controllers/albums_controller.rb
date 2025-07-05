@@ -1,15 +1,22 @@
 class AlbumsController < ApplicationController
   skip_before_action :authenticate_request, only: [:index, :show]
 
-  before_action :set_album, only: [:show, :update]
+  before_action :set_album, only: [:show, :update, :destroy]
 
   # GET /albums.json
   def index
+    limit = (params[:limit] || 25).to_i
+    offset = (params[:offset] || 0).to_i
+
     if params[:query]
-      @albums = Album.where("title ilike ?", "%#{params[:query]}%")
+      base = Album.where("title ilike ?", "%#{params[:query]}%")
     else
-      @albums = Album.all
+      base = Album.all
     end
+
+    @albums = base.limit(limit).offset(offset)
+    @pagination = { total: base.count } if params[:limit].present? || params[:offset].present?
+
     render :index
   end
 
@@ -37,6 +44,16 @@ class AlbumsController < ApplicationController
       render :show, status: :ok, location: @album
     else
       render json: @album.errors, status: :unprocessable_entity
+    end
+  end
+
+  # DELETE /albums/1.json
+  def destroy
+    authorize @album
+    if @album.destroy
+      head :no_content
+    else
+      render json: { errors: @album.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

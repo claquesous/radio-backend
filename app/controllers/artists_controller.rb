@@ -1,15 +1,22 @@
 class ArtistsController < ApplicationController
   skip_before_action :authenticate_request, only: [:index, :show]
 
-  before_action :set_artist, only: [:show, :update]
+  before_action :set_artist, only: [:show, :update, :destroy]
 
   # GET /artists.json
   def index
+    limit = (params[:limit] || 25).to_i
+    offset = (params[:offset] || 0).to_i
+
     if params[:query]
-      @artists = Artist.where("name ilike ?", "%#{params[:query]}%")
+      base = Artist.where("name ilike ?", "%#{params[:query]}%")
     else
-      @artists = Artist.all
+      base = Artist.all
     end
+
+    @artists = base.limit(limit).offset(offset)
+    @pagination = { total: base.count } if params[:limit].present? || params[:offset].present?
+
     render :index
   end
 
@@ -37,6 +44,16 @@ class ArtistsController < ApplicationController
       render :show, status: :ok, location: @artist
     else
       render json: @artist.errors, status: :unprocessable_entity
+    end
+  end
+
+  # DELETE /artists/1.json
+  def destroy
+    authorize @artist
+    if @artist.destroy
+      head :no_content
+    else
+      render json: { errors: @artist.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

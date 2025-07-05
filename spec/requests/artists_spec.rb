@@ -35,4 +35,51 @@ RSpec.describe "Artists", type: :request do
       end
     end
   end
+
+  describe "DELETE /artists/:id" do
+    context "as an admin", as_logged_in_admin: true do
+      it "destroys artist with no songs or albums" do
+        artist = create(:artist)
+        delete artist_path(artist), as: :json
+        expect(response).to have_http_status(:no_content)
+        expect(Artist.exists?(artist.id)).to be false
+      end
+
+      it "does not destroy artist with songs" do
+        artist = create(:artist)
+        create(:song, artist: artist)
+        delete artist_path(artist), as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to include("Cannot delete record because dependent songs exist")
+        expect(Artist.exists?(artist.id)).to be true
+      end
+
+      it "does not destroy artist with albums" do
+        artist = create(:artist)
+        create(:album, artist: artist)
+        delete artist_path(artist), as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to include("Cannot delete record because dependent albums exist")
+        expect(Artist.exists?(artist.id)).to be true
+      end
+    end
+
+    context "as a standard user", as_logged_in_user: true do
+      it "is unauthorized" do
+        artist = create(:artist)
+        delete artist_path(artist), as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when not logged in" do
+      it "is unauthorized" do
+        artist = create(:artist)
+        delete artist_path(artist), as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
 end

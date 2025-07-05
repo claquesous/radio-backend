@@ -8,15 +8,17 @@ class SongsController < ApplicationController
   # GET /songs.json
   def index
     limit = (params[:limit] || 25).to_i
-    if params[:artist]
-      @songs = Artist.find(params[:artist]).songs.limit(limit)
-    elsif params[:album]
-      @songs = Album.find(params[:album]).songs.limit(limit)
-    elsif params[:query]
-      @songs = Song.where("title ilike ?", "%#{params[:query]}%").limit(limit)
+    offset = (params[:offset] || 0).to_i
+
+    if params[:query]
+      base = Song.where("title ilike ?", "%#{params[:query]}%")
     else
-      @songs = Song.limit(limit)
+      base = Song.all
     end
+
+    @songs = base.limit(limit).offset(offset)
+    @pagination = { total: base.count } if params[:limit].present? || params[:offset].present?
+
     render :index
   end
 
