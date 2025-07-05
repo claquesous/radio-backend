@@ -87,4 +87,43 @@ RSpec.describe "Albums", type: :request do
       end
     end
   end
+
+  describe "DELETE /albums/:id" do
+    let!(:artist) { create(:artist) }
+
+    context "as an admin", as_logged_in_admin: true do
+      it "destroys album with no songs" do
+        album = create(:album, artist: artist)
+        delete album_path(album), as: :json
+        expect(response).to have_http_status(:no_content)
+        expect(Album.exists?(album.id)).to be false
+      end
+
+      it "does not destroy album with songs" do
+        album = create(:album, artist: artist)
+        create(:song, album: album)
+        delete album_path(album), as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["errors"]).to include("Cannot delete album with songs")
+        expect(Album.exists?(album.id)).to be true
+      end
+    end
+
+    context "as a standard user", as_logged_in_user: true do
+      it "is unauthorized" do
+        album = create(:album, artist: artist)
+        delete album_path(album), as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "when not logged in" do
+      it "is unauthorized" do
+        album = create(:album, artist: artist)
+        delete album_path(album), as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
 end

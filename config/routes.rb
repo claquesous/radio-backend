@@ -6,7 +6,8 @@ Rails.application.routes.draw do
 
       resources :users, only: [:create]
       resources :plays, only: [:index, :show]
-      resources :songs, :albums, :artists, except: [:new, :edit]
+      resources :songs, except: [:new, :edit, :delete]
+      resources :albums, :artists, except: [:new, :edit]
       resources :streams, except: [:new, :edit] do
         resources :songs, only: :show, module: :streams
         resources :artists, only: :show, module: :streams
