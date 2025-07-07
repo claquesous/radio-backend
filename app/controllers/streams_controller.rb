@@ -66,14 +66,17 @@ class StreamsController < ApplicationController
     limit = (params[:limit] || 25).to_i
     offset = (params[:offset] || 0).to_i
     songs = Song.order(created_at: :desc).limit(limit).offset(offset).includes(:artist, :album)
-    chooser_ids = @stream.choosers.where(song_id: songs.map(&:id)).pluck(:song_id)
+    choosers = @stream.choosers.where(song_id: songs.map(&:id))
+    chooser_map = choosers.index_by(&:song_id)
     result = songs.map do |song|
+      chooser = chooser_map[song.id]
       {
         id: song.id,
         title: song.title,
         artist: { id: song.artist.id, name: song.artist.name },
         album: song.album ? { id: song.album.id, title: song.album.title } : nil,
-        included: chooser_ids.include?(song.id)
+        included: !!chooser,
+        chooser_id: chooser&.id
       }
     end
     render json: result
