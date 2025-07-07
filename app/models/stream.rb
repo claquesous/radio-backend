@@ -3,7 +3,6 @@ class Stream < ApplicationRecord
   has_many :choosers, dependent: :destroy
   has_many :plays
   has_many :requests
-  before_create :add_choosers
   validate :default_rating_in_range
   validate :cannot_enable_on_create, on: :create
   before_destroy :prevent_destroy_if_enabled
@@ -12,11 +11,6 @@ class Stream < ApplicationRecord
 
   attr_encrypted :mastodon_access_token, key: ENV['MASTODON_ACCESS_TOKEN_KEY']
 
-  def add_choosers
-    Song.all.each do |song|
-      choosers.build(song: song, rating: default_rating, featured: default_featured)
-    end
-  end
 
   def next_play
     plays.build(playtime: Time.now, song: pick_requested_song || pick_random_song)
@@ -47,7 +41,7 @@ class Stream < ApplicationRecord
   private
 
     def pick_song_by_rating(rating)
-      options = choosers.where(featured: true).where('rating > ?', rating).to_a
+      options = choosers.where('rating > ?', rating).to_a
       until options.empty?
         candidate = options.delete_at(Random.rand(options.count)).song
         return candidate if can_play?(candidate)

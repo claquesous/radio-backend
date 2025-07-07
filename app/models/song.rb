@@ -5,7 +5,6 @@ class Song < ApplicationRecord
   belongs_to :artist
   has_many :plays
   has_many :choosers, dependent: :destroy
-  before_create :add_choosers
   before_destroy :prevent_destroy
   default_scope { order(:sort) }
 
@@ -18,9 +17,4 @@ class Song < ApplicationRecord
     throw :abort
   end
 
-  def add_choosers
-    Stream.all.each do |stream|
-      choosers.build(stream: stream, rating: stream.default_rating, featured: stream.default_featured)
-    end
-  end
 end

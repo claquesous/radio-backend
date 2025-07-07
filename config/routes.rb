@@ -9,6 +9,9 @@ Rails.application.routes.draw do
       resources :songs, except: [:new, :edit, :destroy]
       resources :albums, :artists, except: [:new, :edit]
       resources :streams, except: [:new, :edit] do
+        member do
+          get :available_songs
+        end
         resources :songs, only: :show, module: :streams
         resources :artists, only: :show, module: :streams
         resources :plays, except: [:new, :edit]
