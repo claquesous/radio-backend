@@ -1,7 +1,7 @@
 class StreamsController < ApplicationController
   skip_before_action :authenticate_request, only: [:index, :show]
 
-  before_action :set_stream, only: %i[ show update destroy available_songs ]
+  before_action :set_stream, except: %i[ index create ]
   before_action :remove_blank_mastodon_access_token, only: :update
 
   # GET /streams.json
@@ -59,6 +59,24 @@ class StreamsController < ApplicationController
     end
 
     render 'songs/index'
+  end
+
+  # GET /streams/1/new_songs_with_included.json
+  def new_songs_with_included
+    limit = (params[:limit] || 25).to_i
+    offset = (params[:offset] || 0).to_i
+    songs = Song.order(created_at: :desc).limit(limit).offset(offset).includes(:artist, :album)
+    chooser_ids = @stream.choosers.where(song_id: songs.map(&:id)).pluck(:song_id)
+    result = songs.map do |song|
+      {
+        id: song.id,
+        title: song.title,
+        artist: { id: song.artist.id, name: song.artist.name },
+        album: song.album ? { id: song.album.id, title: song.album.title } : nil,
+        included: chooser_ids.include?(song.id)
+      }
+    end
+    render json: result
   end
 
   private
