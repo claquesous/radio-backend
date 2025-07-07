@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_21_012549) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_07_040159) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -45,6 +45,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_21_012549) do
     t.datetime "updated_at", null: false
     t.index ["song_id"], name: "index_choosers_on_song_id"
     t.index ["stream_id", "rating"], name: "index_choosers_on_stream_id_and_rating", where: "(featured = true)"
+    t.index ["stream_id", "rating"], name: "index_choosers_on_stream_id_and_rating_unconditional"
     t.index ["stream_id"], name: "index_choosers_on_stream_id"
   end
 
