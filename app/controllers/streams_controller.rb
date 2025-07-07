@@ -74,7 +74,6 @@ class StreamsController < ApplicationController
         id: song.id,
         title: song.title,
         artist: { id: song.artist.id, name: song.artist.name },
-        album: song.album ? { id: song.album.id, title: song.album.title } : nil,
         included: !!chooser,
         chooser_id: chooser&.id
       }
