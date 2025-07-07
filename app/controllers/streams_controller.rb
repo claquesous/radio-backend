@@ -65,7 +65,7 @@ class StreamsController < ApplicationController
   def new_songs_with_included
     limit = (params[:limit] || 25).to_i
     offset = (params[:offset] || 0).to_i
-    songs = Song.order(created_at: :desc).limit(limit).offset(offset).includes(:artist, :album)
+    songs = Song.unscoped.order(created_at: :desc).limit(limit).offset(offset).includes(:artist, :album)
     choosers = @stream.choosers.where(song_id: songs.map(&:id))
     chooser_map = choosers.index_by(&:song_id)
     result = songs.map do |song|
