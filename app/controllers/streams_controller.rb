@@ -46,17 +46,13 @@ class StreamsController < ApplicationController
   # GET /streams/1/available_songs.json
   def available_songs
     chosen_song_ids = @stream.choosers.pluck(:song_id)
-    @songs = Song.where.not(id: chosen_song_ids).includes(:artist, :album)
+    base = Song.where.not(id: chosen_song_ids).includes(:artist)
 
-    if params[:limit].present?
-      limit_value = params[:limit].to_i
-      @songs = @songs.limit(limit_value) if limit_value > 0
-    end
+    limit = (params[:limit] || 50).to_i
+    offset = (params[:offset] || 0).to_i
 
-    if params[:offset].present?
-      offset_value = [params[:offset].to_i, 0].max
-      @songs = @songs.offset(offset_value)
-    end
+    @songs = base.limit(limit).offset(offset)
+    @pagination = { total: base.count }
 
     render 'songs/index'
   end
