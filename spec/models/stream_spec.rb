@@ -41,7 +41,7 @@ RSpec.describe Stream, type: :model do
 
       stream.plays.create(song: song)
       create_list(:song, 4, artist: artist)
-      new_song = create(:chooser, rating: 5).song
+      new_song = create(:chooser, stream: stream, rating: 5).song
 
       expect(stream.choosers.count).to eq(6)
       expect(stream.next_play.song.id).to eq(new_song.id)
@@ -51,7 +51,7 @@ RSpec.describe Stream, type: :model do
       song = create(:song)
 
       stream.plays.create(song: song)
-      new_song = create(:chooser, rating: 5).song
+      new_song = create(:chooser, stream: stream, rating: 5).song
 
       expect(stream.choosers.count).to eq(2)
       expect(stream.next_play.song.id).to eq(new_song.id)
