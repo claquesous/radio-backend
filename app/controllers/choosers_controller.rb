@@ -2,6 +2,7 @@ class ChoosersController < ApplicationController
   skip_before_action :authenticate_request, only: [:index]
 
   before_action :set_stream
+  before_action :authorize_stream, except: [:index]
 
   # GET /choosers.json
   def index
@@ -73,6 +74,10 @@ class ChoosersController < ApplicationController
   private
     def set_stream
       @stream = Stream.find(params[:stream_id])
+    end
+
+    def authorize_stream
+      authorize @stream, :update?
     end
 
     def chooser_params
