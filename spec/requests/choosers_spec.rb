@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Choosers API", type: :request do
+RSpec.describe "Choosers", type: :request do
   let(:user) { create(:user) }
   let(:other_user) { create(:user) }
   let(:stream) { create(:stream, user: user) }
@@ -13,7 +13,7 @@ RSpec.describe "Choosers API", type: :request do
 
     it "returns choosers for the stream as the owner" do
       chooser
-      get "/streams/#{stream.id}/choosers"
+      get stream_choosers_path(stream.id)
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body).to include(a_hash_including("id" => chooser.id))
     end
@@ -21,7 +21,7 @@ RSpec.describe "Choosers API", type: :request do
     it "returns forbidden for non-owner" do
       @logged_in_user = other_user
       chooser
-      get "/streams/#{stream.id}/choosers"
+      get stream_choosers_path(stream.id)
       expect(response).to have_http_status(:forbidden)
     end
   end
@@ -30,19 +30,19 @@ RSpec.describe "Choosers API", type: :request do
     before { @logged_in_user = user }
 
     it "shows a chooser as the owner" do
-      get "/streams/#{stream.id}/choosers/#{chooser.id}"
+      get stream_chooser_path(stream.id, chooser.id)
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body["id"]).to eq(chooser.id)
     end
 
     it "returns not found for invalid id" do
-      get "/streams/#{stream.id}/choosers/999999"
+      get stream_chooser_path(stream.id, 999999)
       expect(response).to have_http_status(:not_found)
     end
 
     it "returns forbidden for non-owner" do
       @logged_in_user = other_user
-      get "/streams/#{stream.id}/choosers/#{chooser.id}"
+      get stream_chooser_path(stream.id, chooser.id)
       expect(response).to have_http_status(:forbidden)
     end
   end
@@ -52,7 +52,7 @@ RSpec.describe "Choosers API", type: :request do
 
     it "creates a chooser as the owner" do
       expect {
-        post "/streams/#{stream.id}/choosers", params: { chooser: { song_id: other_song.id, rating: 42 } }
+        post stream_choosers_path(stream.id), params: { chooser: { song_id: other_song.id, rating: 42 } }
       }.to change { Chooser.count }.by(1)
       expect(response).to have_http_status(:created)
       expect(response.parsed_body["song"]["id"]).to eq(other_song.id)
@@ -60,18 +60,18 @@ RSpec.describe "Choosers API", type: :request do
 
     it "returns error for duplicate chooser" do
       chooser
-      post "/streams/#{stream.id}/choosers", params: { chooser: { song_id: song.id, rating: 42 } }
+      post stream_choosers_path(stream.id), params: { chooser: { song_id: song.id, rating: 42 } }
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it "returns error for missing song_id" do
-      post "/streams/#{stream.id}/choosers", params: { chooser: { rating: 42 } }
+      post stream_choosers_path(stream.id), params: { chooser: { rating: 42 } }
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it "returns forbidden for non-owner" do
       @logged_in_user = other_user
-      post "/streams/#{stream.id}/choosers", params: { chooser: { song_id: other_song.id, rating: 42 } }
+      post stream_choosers_path(stream.id), params: { chooser: { song_id: other_song.id, rating: 42 } }
       expect(response).to have_http_status(:forbidden)
     end
   end
@@ -80,24 +80,24 @@ RSpec.describe "Choosers API", type: :request do
     before { @logged_in_user = user }
 
     it "updates a chooser's rating as the owner" do
-      patch "/streams/#{stream.id}/choosers/#{chooser.id}", params: { chooser: { rating: 99 } }
+      patch stream_chooser_path(stream.id, chooser.id), params: { chooser: { rating: 99 } }
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body["rating"]).to eq(99)
     end
 
     it "returns error for invalid params" do
-      patch "/streams/#{stream.id}/choosers/#{chooser.id}", params: { chooser: { rating: nil } }
+      patch stream_chooser_path(stream.id, chooser.id), params: { chooser: { rating: nil } }
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it "returns forbidden for non-owner" do
       @logged_in_user = other_user
-      patch "/streams/#{stream.id}/choosers/#{chooser.id}", params: { chooser: { rating: 88 } }
+      patch stream_chooser_path(stream.id, chooser.id), params: { chooser: { rating: 88 } }
       expect(response).to have_http_status(:forbidden)
     end
 
     it "returns not found for invalid id" do
-      patch "/streams/#{stream.id}/choosers/999999", params: { chooser: { rating: 88 } }
+      patch stream_chooser_path(stream.id, 999999), params: { chooser: { rating: 88 } }
       expect(response).to have_http_status(:not_found)
     end
   end
@@ -108,7 +108,7 @@ RSpec.describe "Choosers API", type: :request do
     it "deletes a chooser as the owner" do
       chooser # create it
       expect {
-        delete "/streams/#{stream.id}/choosers/#{chooser.id}"
+        delete stream_chooser_path(stream.id, chooser.id)
       }.to change { Chooser.count }.by(-1)
       expect(response).to have_http_status(:no_content)
     end
@@ -116,39 +116,39 @@ RSpec.describe "Choosers API", type: :request do
     it "returns forbidden for non-owner" do
       chooser
       @logged_in_user = other_user
-      delete "/streams/#{stream.id}/choosers/#{chooser.id}"
+      delete stream_chooser_path(stream.id, chooser.id)
       expect(response).to have_http_status(:forbidden)
     end
 
     it "returns not found for invalid id" do
-      delete "/streams/#{stream.id}/choosers/999999"
+      delete stream_chooser_path(stream.id, 999999)
       expect(response).to have_http_status(:not_found)
     end
   end
 
   describe "unauthorized requests" do
     it "returns unauthorized for index" do
-      get "/streams/#{stream.id}/choosers"
+      get stream_choosers_path(stream.id)
       expect(response).to have_http_status(:unauthorized)
     end
 
     it "returns unauthorized for show" do
-      get "/streams/#{stream.id}/choosers/#{chooser.id}"
+      get stream_chooser_path(stream.id, chooser.id)
       expect(response).to have_http_status(:unauthorized)
     end
 
     it "returns unauthorized for create" do
-      post "/streams/#{stream.id}/choosers", params: { chooser: { song_id: other_song.id, rating: 42 } }
+      post stream_choosers_path(stream.id), params: { chooser: { song_id: other_song.id, rating: 42 } }
       expect(response).to have_http_status(:unauthorized)
     end
 
     it "returns unauthorized for update" do
-      patch "/streams/#{stream.id}/choosers/#{chooser.id}", params: { chooser: { rating: 88 } }
+      patch stream_chooser_path(stream.id, chooser.id), params: { chooser: { rating: 88 } }
       expect(response).to have_http_status(:unauthorized)
     end
 
     it "returns unauthorized for destroy" do
-      delete "/streams/#{stream.id}/choosers/#{chooser.id}"
+      delete stream_chooser_path(stream.id, chooser.id)
       expect(response).to have_http_status(:unauthorized)
     end
   end
