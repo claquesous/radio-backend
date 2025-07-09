@@ -19,8 +19,8 @@ class Song < ApplicationRecord
   end
 
   def add_choosers
-    Stream.all.each do |stream|
-      choosers.build(stream: stream, rating: stream.default_rating, featured: stream.default_featured)
+    Stream.where(default_featured: true).each do |stream|
+      choosers.build(stream: stream, rating: stream.default_rating)
     end
   end
 end

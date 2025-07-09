@@ -77,7 +77,6 @@ FactoryBot.define do
     stream
     song
     rating { 50 }
-    featured { true }
   end
 
 end

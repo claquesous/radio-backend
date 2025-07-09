@@ -1,16 +1,10 @@
 class ChoosersController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index]
-
   before_action :set_stream
+  before_action :authorize_stream, except: [:index]
 
   # GET /choosers.json
   def index
-    @choosers = @stream.choosers.where(stream: @stream).includes(:song).includes(song: :artist)
-
-    if params[:featured].present?
-      featured_value = params[:featured] == 'true'
-      @choosers = @choosers.where(featured: featured_value)
-    end
+    @choosers = @stream.choosers.includes(:song).includes(song: :artist)
 
     if params[:sort].present? && params[:sort] == 'created_at'
       @choosers = @choosers.unscoped.order(created_at: :desc)
@@ -48,6 +42,23 @@ class ChoosersController < ApplicationController
     render :index
   end
 
+  # POST /choosers.json
+  def create
+    @chooser = @stream.choosers.build(chooser_params)
+    if @chooser.save
+      render :show, status: :created
+    else
+      render json: @chooser.errors, status: :unprocessable_entity
+    end
+  end
+
+  # DELETE /choosers/1.json
+  def destroy
+    @chooser = @stream.choosers.find(params[:id])
+    @chooser.destroy
+    head :no_content
+  end
+
   # PATCH/PUT /choosers/1.json
   def update
     @chooser = Chooser.find(params[:id])
@@ -63,7 +74,11 @@ class ChoosersController < ApplicationController
       @stream = Stream.find(params[:stream_id])
     end
 
+    def authorize_stream
+      authorize @stream, :update?
+    end
+
     def chooser_params
-      params.require(:chooser).permit(:featured, :rating)
+      params.require(:chooser).permit(:song_id, :rating)
     end
 end
