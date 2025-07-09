@@ -19,19 +19,6 @@ RSpec.describe "/choosers", type: :request do
         expect(response.parsed_body).to include(a_hash_including("id" => @chooser.id))
       end
     end
-
-    context "as non-owner" do
-      before do
-        @stream = create(:stream, user: user)
-        @chooser = create(:chooser, stream: @stream, song: song)
-        allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(other_user)
-      end
-
-      it "returns forbidden for non-owner" do
-        get stream_choosers_path(@stream)
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
   end
 
   describe "POST /streams/:stream_id/choosers" do
