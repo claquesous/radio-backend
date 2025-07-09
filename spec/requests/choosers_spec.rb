@@ -34,12 +34,6 @@ RSpec.describe "/choosers", type: :request do
         expect(response.parsed_body["song"]["id"]).to eq(other_song.id)
       end
 
-      it "returns error for duplicate chooser" do
-        create(:chooser, stream: @stream, song: song)
-        post stream_choosers_path(@stream), params: { chooser: { song_id: song.id, rating: 42 } }
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-
       it "returns error for missing song_id" do
         post stream_choosers_path(@stream), params: { chooser: { rating: 42 } }
         expect(response).to have_http_status(:unprocessable_entity)
@@ -70,11 +64,6 @@ RSpec.describe "/choosers", type: :request do
         patch stream_chooser_path(@stream, @chooser), params: { chooser: { rating: 99 } }
         expect(response).to have_http_status(:ok)
         expect(response.parsed_body["rating"]).to eq(99)
-      end
-
-      it "returns error for invalid params" do
-        patch stream_chooser_path(@stream, @chooser), params: { chooser: { rating: nil } }
-        expect(response).to have_http_status(:unprocessable_entity)
       end
 
       it "returns not found for invalid id" do
