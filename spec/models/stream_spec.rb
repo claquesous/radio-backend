@@ -120,4 +120,49 @@ RSpec.describe Stream, type: :model do
       expect(StreamEventPublisher).not_to have_received(:publish).with(:stream_updated, stream)
     end
   end
+
+  describe 'playlist variety validation' do
+    context 'when stream has fewer than the minimum required choosers' do
+      before { create_list(:chooser, (Stream::MIN_CHOOSERS_REQUIRED - 1).to_i, stream: stream) }
+      it 'is not valid' do
+        stream.enabled = true
+        expect(stream).not_to be_valid
+        expect(stream.errors[:enabled]).to include("cannot be enabled: not enough playlist variety")
+      end
+    end
+
+    context 'when stream has enough choosers but not enough variety' do
+      let!(:artists) { create_list(:artist, 70) }
+      before do
+        artists.each do |artist|
+          create(:chooser, stream: stream, song: create(:song, artist: artist))
+        end
+        # Fill up to minimum choosers required, but not enough extra_songs for variety
+        (Stream::MIN_CHOOSERS_REQUIRED - artists.size).to_i.times do
+          create(:chooser, stream: stream, song: create(:song, artist: artists.first))
+        end
+      end
+      it 'is not valid' do
+        stream.enabled = true
+        expect(stream).not_to be_valid
+        expect(stream.errors[:enabled]).to include("cannot be enabled: not enough playlist variety")
+      end
+    end
+
+    context 'when stream meets all playlist variety requirements' do
+      let!(:artists) { create_list(:artist, 60) }
+      before do
+        # Each artist gets two songs, then fill up to required choosers with more from the first artist
+        artists.each do |artist|
+          2.times { create(:chooser, stream: stream, song: create(:song, artist: artist)) }
+        end
+        needed = Stream::MIN_CHOOSERS_REQUIRED - (artists.size * 2)
+        needed.times { create(:chooser, stream: stream, song: create(:song, artist: artists.first)) } if needed > 0
+      end
+      it 'is valid' do
+        stream.enabled = true
+        expect(stream).to be_valid
+      end
+    end
+  end
 end
