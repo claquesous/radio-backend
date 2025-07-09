@@ -57,8 +57,8 @@ class StreamsController < ApplicationController
     render 'songs/index'
   end
 
-  # GET /streams/1/new_songs_with_included.json
-  def new_songs_with_included
+  # GET /streams/1/new_songs.json
+  def new_songs
     limit = (params[:limit] || 25).to_i
     offset = (params[:offset] || 0).to_i
     songs = Song.unscoped.order(created_at: :desc).limit(limit).offset(offset).includes(:artist, :album)

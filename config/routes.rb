@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       resources :streams, except: [:new, :edit] do
         member do
           get :available_songs
-          get :new_songs_with_included
+          get :new_songs
         end
         resources :songs, only: :show, module: :streams
         resources :artists, only: :show, module: :streams
