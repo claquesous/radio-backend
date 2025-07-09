@@ -34,39 +34,6 @@ RSpec.describe "/choosers", type: :request do
     end
   end
 
-  describe "GET /streams/:stream_id/choosers/:id" do
-    context "as owner", :as_logged_in_user do
-      before do
-        @stream = create(:stream, user: @logged_in_user)
-        @chooser = create(:chooser, stream: @stream, song: song)
-      end
-
-      it "shows a chooser as the owner" do
-        get stream_chooser_path(@stream, @chooser)
-        expect(response).to have_http_status(:ok)
-        expect(response.parsed_body["id"]).to eq(@chooser.id)
-      end
-
-      it "returns not found for invalid id" do
-        get stream_chooser_path(@stream, 999999)
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context "as non-owner" do
-      before do
-        @stream = create(:stream, user: user)
-        @chooser = create(:chooser, stream: @stream, song: song)
-        allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(other_user)
-      end
-
-      it "returns forbidden for non-owner" do
-        get stream_chooser_path(@stream, @chooser)
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
-  end
-
   describe "POST /streams/:stream_id/choosers" do
     context "as owner", :as_logged_in_user do
       before { @stream = create(:stream, user: @logged_in_user) }
@@ -182,11 +149,6 @@ RSpec.describe "/choosers", type: :request do
 
     it "returns unauthorized for index" do
       get stream_choosers_path(stream)
-      expect(response).to have_http_status(:unauthorized)
-    end
-
-    it "returns unauthorized for show" do
-      get stream_chooser_path(stream, chooser)
       expect(response).to have_http_status(:unauthorized)
     end
 

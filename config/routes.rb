@@ -18,7 +18,7 @@ Rails.application.routes.draw do
         resources :plays, except: [:new, :edit]
         resources :ratings, only: [:create]
         resources :requests, except: [:new, :edit]
-        resources :choosers, except: [:new, :edit]
+        resources :choosers, except: [:new, :edit, :show]
       end
     end
   end
