@@ -26,8 +26,9 @@ RSpec.describe "/choosers", type: :request do
       before { @stream = create(:stream, user: @logged_in_user) }
 
       it "creates a chooser as the owner" do
+        song_id = other_song.id
         expect {
-          post stream_choosers_path(@stream), params: { chooser: { song_id: other_song.id, rating: 42 } }
+          post stream_choosers_path(@stream), params: { chooser: { song_id: song_id, rating: 42 } }
         }.to change { Chooser.count }.by(1)
         expect(response).to have_http_status(:created)
         expect(response.parsed_body["song"]["id"]).to eq(other_song.id)

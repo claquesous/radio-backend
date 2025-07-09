@@ -1,6 +1,4 @@
 class ChoosersController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index]
-
   before_action :set_stream
   before_action :authorize_stream, except: [:index]
 
