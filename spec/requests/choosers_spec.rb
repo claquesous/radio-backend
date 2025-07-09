@@ -52,9 +52,9 @@ RSpec.describe "/choosers", type: :request do
         allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(other_user)
       end
 
-      it "returns forbidden for non-owner" do
+      it "returns unauthorized for non-owner" do
         post stream_choosers_path(@stream), params: { chooser: { song_id: other_song.id, rating: 42 } }
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
@@ -90,9 +90,9 @@ RSpec.describe "/choosers", type: :request do
         allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(other_user)
       end
 
-      it "returns forbidden for non-owner" do
+      it "returns unauthorized for non-owner" do
         patch stream_chooser_path(@stream, @chooser), params: { chooser: { rating: 88 } }
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
@@ -124,9 +124,9 @@ RSpec.describe "/choosers", type: :request do
         allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(other_user)
       end
 
-      it "returns forbidden for non-owner" do
+      it "returns unauthorized for non-owner" do
         delete stream_chooser_path(@stream, @chooser)
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
