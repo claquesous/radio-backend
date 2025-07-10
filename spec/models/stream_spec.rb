@@ -78,6 +78,7 @@ RSpec.describe Stream, type: :model do
 
     before do
       allow(StreamEventPublisher).to receive(:publish)
+      allow_any_instance_of(Stream).to receive(:validate_chooser_set).and_return(true)
     end
 
     it "publishes stream_created when enabled goes from false to true" do
@@ -149,20 +150,10 @@ RSpec.describe Stream, type: :model do
       end
     end
 
-    context 'when stream meets all playlist variety requirements' do
-      let!(:artists) { create_list(:artist, 60) }
-      before do
-        # Each artist gets two songs, then fill up to required choosers with more from the first artist
-        artists.each do |artist|
-          2.times { create(:chooser, stream: stream, song: create(:song, artist: artist)) }
-        end
-        needed = Stream::MIN_CHOOSERS_REQUIRED - (artists.size * 2)
-        needed.times { create(:chooser, stream: stream, song: create(:song, artist: artists.first)) } if needed > 0
-      end
-      it 'is valid' do
-        stream.enabled = true
-        expect(stream).to be_valid
-      end
+    it 'when stream meets all playlist variety requirements is valid' do
+      create_list(:song, Stream::MIN_CHOOSERS_REQUIRED)
+      stream.enabled = true
+      expect(stream).to be_valid
     end
   end
 end

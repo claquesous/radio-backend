@@ -2,13 +2,14 @@ require 'rails_helper'
 
 RSpec.describe Chooser, type: :model do
   let(:user) { create(:user) }
-  let(:stream) { create(:stream, user: user, enabled: true) }
+  let(:stream) { create(:stream, user: user, enabled: false) }
 
   describe 'deletion prevention for enabled streams' do
     context 'when deletion would cause stream to have too few choosers' do
       let!(:choosers) { create_list(:chooser, Stream::MIN_CHOOSERS_REQUIRED, stream: stream) }
 
       it 'prevents deletion of the last required chooser' do
+        stream.update(enabled: true)
         chooser_to_delete = choosers.last
         expect { chooser_to_delete.destroy! }.to raise_error(ActiveRecord::RecordNotDestroyed)
         expect(chooser_to_delete.errors[:base]).to include("Cannot delete chooser: would violate stream requirements")
@@ -21,6 +22,7 @@ RSpec.describe Chooser, type: :model do
       end
 
       it 'allows deletion when requirements are still met' do
+        stream.update(enabled: true)
         chooser_to_delete = stream.choosers.last
         expect { chooser_to_delete.destroy! }.not_to raise_error
       end
@@ -47,6 +49,7 @@ RSpec.describe Chooser, type: :model do
       end
 
       it 'allows deletion when it does not violate artist limits' do
+        stream.update(enabled: true)
         chooser_to_delete = stream.choosers.joins(:song).where('songs.artist_id = ?', other_artist.id).first
         expect { chooser_to_delete.destroy! }.not_to raise_error
       end
