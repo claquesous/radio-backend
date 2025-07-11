@@ -55,8 +55,11 @@ class ChoosersController < ApplicationController
   # DELETE /choosers/1.json
   def destroy
     @chooser = @stream.choosers.find(params[:id])
-    @chooser.destroy
-    head :no_content
+    if @chooser.destroy
+      head :no_content
+    else
+      render json: { errors: @chooser.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   # PATCH/PUT /choosers/1.json
