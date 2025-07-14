@@ -1,10 +1,16 @@
 class Stream < ApplicationRecord
+  SONG_REPEAT_WINDOW = 80
+  ARTIST_REPEAT_WINDOW = 40
+  VARIETY_FACTOR = 1.5
+  MIN_CHOOSERS_REQUIRED = SONG_REPEAT_WINDOW * VARIETY_FACTOR
+
   belongs_to :user
   has_many :choosers, dependent: :destroy
   has_many :plays
   has_many :requests
   validate :default_rating_in_range
   validate :cannot_enable_on_create, on: :create
+  validate :sufficient_choosers_when_enabled
   before_destroy :prevent_destroy_if_enabled
 
   after_commit :publish_stream_events
@@ -38,6 +44,19 @@ class Stream < ApplicationRecord
     plays.group(:album_id).order('count_album_id desc').count(:album_id)
   end
 
+  def validate_chooser_set(chooser_set)
+    unique_artists = chooser_set.joins(:song).distinct.count('songs.artist_id')
+    required_song_variety = SONG_REPEAT_WINDOW * VARIETY_FACTOR
+    required_artist_variety = ARTIST_REPEAT_WINDOW * VARIETY_FACTOR
+
+    unless chooser_set.count >= required_song_variety && unique_artists >= required_artist_variety
+      errors.add(:enabled, "cannot be enabled: not enough playlist variety")
+      return false
+    end
+
+    true
+  end
+
   private
 
     def pick_song_by_rating(rating)
@@ -61,8 +80,8 @@ class Stream < ApplicationRecord
 
     def can_play?(song)
       return false unless song
-      plays.limit(80).includes(:song, :artist).each_with_index do |play, i|
-        return false if play.song == song || (i<40 && play.artist == song.artist)
+      plays.limit(SONG_REPEAT_WINDOW).includes(:song, :artist).each_with_index do |play, i|
+        return false if play.song == song || (i < ARTIST_REPEAT_WINDOW && play.artist == song.artist)
       end
       true
     end
@@ -84,6 +103,11 @@ class Stream < ApplicationRecord
         errors.add(:base, "Cannot destroy an enabled stream")
         throw(:abort)
       end
+    end
+
+    def sufficient_choosers_when_enabled
+      return unless enabled_changed? && enabled
+      validate_chooser_set(choosers)
     end
 
     def publish_stream_events

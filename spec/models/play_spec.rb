@@ -19,6 +19,7 @@ RSpec.describe Play, type: :model do
 
     it "marks requests as played even if not eligible" do
       request = create(:request, requested_at: 1.minute.ago)
+      create(:chooser, stream: request.stream, song: request.song)
       play = request.stream.next_play # "randomly" picks the only song
       play.save!
       request.reload
@@ -42,6 +43,7 @@ RSpec.describe Play, type: :model do
     it "does not mark previously played songs as played" do
       old_play = create(:play)
       request = create(:request, played: true, play: old_play)
+      create(:chooser, stream: request.stream, song: request.song)
       new_play = request.stream.next_play
       new_play.save!
       request.reload

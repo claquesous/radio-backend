@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "Ratings", type: :request do
-  let(:play) { create(:play) }
-  let(:stream) { play.stream }
+  let(:stream) { create(:stream, default_featured: true) }
+  let(:play) { create(:play, stream: stream) }
   let(:valid_params) { { rating: { up: true, play_id: play.id } } }
 
   describe "POST /ratings" do

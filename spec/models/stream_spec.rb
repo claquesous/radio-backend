@@ -5,7 +5,7 @@ RSpec.describe Stream, type: :model do
   it { should have_many(:plays) }
   it { should have_many(:requests) }
 
-  let(:stream) { create(:stream) }
+  let(:stream) { create(:stream, default_featured: true) }
 
   describe "#next_play" do
     it "returns eligible requests first" do
@@ -78,6 +78,7 @@ RSpec.describe Stream, type: :model do
 
     before do
       allow(StreamEventPublisher).to receive(:publish)
+      allow_any_instance_of(Stream).to receive(:validate_chooser_set).and_return(true)
     end
 
     it "publishes stream_created when enabled goes from false to true" do
@@ -120,4 +121,35 @@ RSpec.describe Stream, type: :model do
       expect(StreamEventPublisher).not_to have_received(:publish).with(:stream_updated, stream)
     end
   end
+
+  describe 'playlist variety validation' do
+    context 'when stream has fewer than the minimum required choosers' do
+      let(:stream) { create(:stream, enabled: false) }
+      before { create_list(:chooser, (120 - 1).to_i, stream: stream) }
+      it 'is not valid' do
+        stream.enabled = true
+        expect(stream).not_to be_valid
+        expect(stream.errors[:enabled]).to include("cannot be enabled: not enough playlist variety")
+      end
+    end
+
+    context 'when stream has enough choosers but not enough variety' do
+      let!(:artists) { create_list(:artist, 3) }
+      it 'is not valid' do
+        120.times do |i|
+          create(:chooser, stream: stream, song: create(:song, artist: artists[i%3]))
+        end
+        stream.enabled = true
+        expect(stream).not_to be_valid
+        expect(stream.errors[:enabled]).to include("cannot be enabled: not enough playlist variety")
+      end
+    end
+
+    it 'when stream meets all playlist variety requirements is valid' do
+      create_list(:chooser, 120, stream: stream)
+      stream.enabled = true
+      expect(stream).to be_valid
+    end
+  end
 end
+
