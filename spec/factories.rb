@@ -68,7 +68,7 @@ FactoryBot.define do
     user
     name { "MyStream" }
     default_rating { 50.0 }
-    default_featured { true }
+    default_featured { false }
     mastodon_url { "https://mastodon.social" }
     mastodon_access_token { "abcd1234" }
   end

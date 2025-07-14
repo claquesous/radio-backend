@@ -18,13 +18,13 @@ RSpec.describe Rating, type: :model do
   describe "#single_rating" do
     it "doesn't allow users to rate a play twice" do
       user = create(:user)
-      play = create(:play)
+      play = create(:play, stream: create(:stream, default_featured: true))
       create(:rating, play: play, user: user)
       expect(build(:rating, play: play, user: user)).to_not be_valid
     end
 
     it "allows stream owner to rate multiple times" do
-      stream = create(:stream)
+      stream = create(:stream, default_featured: true)
       play = create(:play, stream: stream)
       create(:rating, play: play, user: stream.user)
       expect(build(:rating, play: play, user: stream.user)).to be_valid
@@ -36,15 +36,13 @@ RSpec.describe Rating, type: :model do
 
     context "up" do
       it "upgrades middling songs a lot" do
-        chooser = play.stream.choosers.where(song: play.song).first
-        chooser.update!(rating: 50)
+        chooser = create(:chooser, song: play.song, stream: play.stream, rating: 50)
         create(:rating, play: play, up: true)
         expect(chooser.reload.rating).to be_within(0.001).of(55.0)
       end
 
       it "barely upgrades high rated songs" do
-        chooser = play.stream.choosers.where(song: play.song).first
-        chooser.update!(rating: 99)
+        chooser = create(:chooser, song: play.song, stream: play.stream, rating: 99)
         create(:rating, play: play, up: true)
         expect(chooser.reload.rating).to be_within(0.001).of(99.198)
       end
@@ -52,15 +50,13 @@ RSpec.describe Rating, type: :model do
 
     context "down" do
       it "downgrades middling songs a lot" do
-        chooser = play.stream.choosers.where(song: play.song).first
-        chooser.update!(rating: 50)
+        chooser = create(:chooser, song: play.song, stream: play.stream, rating: 50)
         create(:rating, play: play, up: false)
         expect(chooser.reload.rating).to be_within(0.001).of(45.0)
       end
 
       it "barely downgrades low rated songs" do
-        chooser = play.stream.choosers.where(song: play.song).first
-        chooser.update!(rating: 1)
+        chooser = create(:chooser, song: play.song, stream: play.stream, rating: 1)
         create(:rating, play: play, up: false)
         expect(chooser.reload.rating).to be_within(0.001).of(0.802)
       end

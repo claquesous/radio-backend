@@ -46,10 +46,10 @@ class Stream < ApplicationRecord
 
   def validate_chooser_set(chooser_set)
     unique_artists = chooser_set.joins(:song).distinct.count('songs.artist_id')
-    extra_songs = SONG_REPEAT_WINDOW - unique_artists
-    required_variety = (ARTIST_REPEAT_WINDOW * VARIETY_FACTOR).ceil
+    required_song_variety = SONG_REPEAT_WINDOW * VARIETY_FACTOR
+    required_artist_variety = ARTIST_REPEAT_WINDOW * VARIETY_FACTOR
 
-    unless chooser_set.count >= MIN_CHOOSERS_REQUIRED && extra_songs > required_variety
+    unless chooser_set.count >= required_song_variety && unique_artists >= required_artist_variety
       errors.add(:enabled, "cannot be enabled: not enough playlist variety")
       return false
     end
