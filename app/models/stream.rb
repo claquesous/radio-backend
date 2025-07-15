@@ -23,7 +23,7 @@ class Stream < ApplicationRecord
   end
 
   def by_date(from = nil, to = nil)
-    plays = self.plays.unscoped
+    plays = self.plays.unscoped.where(stream: self)
     plays = plays.where('playtime > ?', from) if from
     plays = plays.where('playtime < ?', to) if to
     plays
