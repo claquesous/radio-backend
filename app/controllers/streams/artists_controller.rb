@@ -9,8 +9,13 @@ module Streams
       artist_streams = @artist.plays.where(stream: stream)
 
       @song_ratings = {}
+      @songs = []
       @artist.songs.each do |song|
-        @song_ratings[song.id] = stream.choosers.where(song: song).pluck(:rating).first
+        chooser = stream.choosers.where(song: song)
+        if chooser.exists?
+          @song_ratings[song.id] = chooser.pluck(:rating).first
+          @songs << song
+        end
       end
       @play_count = artist_streams.count
       @last_played_at = artist_streams.first.try(:playtime)

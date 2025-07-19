@@ -10,10 +10,15 @@ class SongsController < ApplicationController
     limit = (params[:limit] || 25).to_i
     offset = (params[:offset] || 0).to_i
 
-    if params[:query]
-      base = Song.where("title ilike ?", "%#{params[:query]}%")
+    if params[:stream_id]
+      stream = Stream.find(params[:stream_id])
+      base = stream ? stream.songs : Song.none
     else
       base = Song.all
+    end
+
+    if params[:query]
+      base = base.where("title ilike ?", "%#{params[:query]}%")
     end
 
     @songs = base.limit(limit).offset(offset)

@@ -29,6 +29,17 @@ RSpec.describe "/songs", type: :request do
       expect(response.body).to include('abc')
       expect(response.body).to_not include('xyz')
     end
+
+    it "queries by stream" do
+      stream = create(:stream)
+      song1 = create(:song, title: 'abc')
+      create(:song, title: 'xyz')
+      create(:chooser, song: song1, stream: stream)
+
+      get songs_url, params: { stream_id: stream.id }
+      expect(response.body).to include('abc')
+      expect(response.body).to_not include('xyz')
+    end
   end
 
   describe "GET /show" do

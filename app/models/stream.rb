@@ -8,6 +8,8 @@ class Stream < ApplicationRecord
   has_many :choosers, dependent: :destroy
   has_many :plays
   has_many :requests
+  has_many :songs, through: :choosers
+
   validate :default_rating_in_range
   validate :cannot_enable_on_create, on: :create
   validate :sufficient_choosers_when_enabled
@@ -23,7 +25,7 @@ class Stream < ApplicationRecord
   end
 
   def by_date(from = nil, to = nil)
-    plays = self.plays.unscoped
+    plays = self.plays.unscoped.where(stream: self)
     plays = plays.where('playtime > ?', from) if from
     plays = plays.where('playtime < ?', to) if to
     plays
