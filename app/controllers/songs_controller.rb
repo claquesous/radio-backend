@@ -69,7 +69,7 @@ class SongsController < ApplicationController
     end
 
     def song_params
-      params.require(:song).permit(:title, :album_id, :artist_id, :sort, :slug, :track, :time, :featured, :live, :remix, :rating, :path, :year, :artist_name_override, :musicbrainz_metadata)
+      params.require(:song).permit(:title, :album_id, :artist_id, :sort, :slug, :track, :time, :featured, :live, :remix, :rating, :path, :year, :artist_name_override, musicbrainz_metadata: {})
     end
 
     def upload_to_s3
