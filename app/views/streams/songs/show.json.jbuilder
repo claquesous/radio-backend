@@ -1,4 +1,4 @@
-json.extract! @song, :id, :title
+json.extract! @song, :id, :title, :musicbrainz_metadata
 json.artist do
   json.extract! @song.artist, :id, :name
 end
