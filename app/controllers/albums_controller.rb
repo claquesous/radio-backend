@@ -63,6 +63,6 @@ class AlbumsController < ApplicationController
     end
 
     def album_params
-      params.require(:album).permit(:artist_id, :title, :sort, :slug, :tracks, :id3_genre, :record_label)
+      params.require(:album).permit(:title, :artist_id, :sort, :slug, :tracks, :id3_genre, :record_label, musicbrainz_metadata: {})
     end
 end

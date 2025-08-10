@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_07_040159) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_19_060002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,7 +24,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_07_040159) do
     t.string "record_label"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.jsonb "musicbrainz_metadata"
     t.index ["artist_id"], name: "index_albums_on_artist_id"
+    t.index ["musicbrainz_metadata"], name: "index_albums_on_musicbrainz_metadata", using: :gin
   end
 
   create_table "artists", id: :serial, force: :cascade do |t|
@@ -33,6 +35,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_07_040159) do
     t.string "slug"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.jsonb "musicbrainz_metadata"
+    t.index ["musicbrainz_metadata"], name: "index_artists_on_musicbrainz_metadata", using: :gin
     t.index ["name"], name: "index_artists_on_name", unique: true
   end
 
@@ -103,9 +107,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_07_040159) do
     t.datetime "updated_at", precision: nil, null: false
     t.integer "year"
     t.string "artist_name_override"
+    t.jsonb "musicbrainz_metadata"
     t.index ["album_id"], name: "index_songs_on_album_id"
     t.index ["artist_id", "title"], name: "index_songs_on_artist_id_and_title", unique: true
     t.index ["artist_id"], name: "index_songs_on_artist_id"
+    t.index ["musicbrainz_metadata"], name: "index_songs_on_musicbrainz_metadata", using: :gin
     t.index ["rating", "featured"], name: "index_songs_on_rating_and_featured"
   end
 
