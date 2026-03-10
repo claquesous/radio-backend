@@ -39,6 +39,12 @@ It is again recommended that you run the script in development first so you don'
 RAILS_ENV=development rake radio:ingest
 ```
 
+If your music library is mounted via CIFS/SMB (e.g. a Windows share), set `CIFS_MUSIC_LIBRARY=1` to enable path normalization. CIFS mounts strip trailing dots from path components due to a Windows NTFS constraint, so without this, any artist/album directories ending in `.` will not be found correctly.
+
+```
+CIFS_MUSIC_LIBRARY=1 RAILS_ENV=development rake radio:ingest
+```
+
 # Running the app
 
 This is a rails app so you should deploy and run it however you typically do. An example command for running in production could be the following:

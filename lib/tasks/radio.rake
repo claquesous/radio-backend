@@ -1,6 +1,13 @@
 require 'mp3info'
 
 namespace :radio do
+  # CIFS mounts strip trailing dots from path components (Windows NTFS constraint).
+  # Normalize a path by removing trailing dots from each segment so file lookups work.
+  def cifs_normalize(path)
+    parts = path.split('/')
+    parts.map { |p| p.sub(/\.+$/, '') }.join('/')
+  end
+
   def add_artist(name)
     artist = Artist.find_or_initialize_by(name: name) do |artist|
       artist.sort = name.sub(/^The /, '')
@@ -43,6 +50,7 @@ namespace :radio do
       slice = path.strip.split(/[\\\/]/).slice(-3,3)
       artist,album,track = slice
       path = File.join(slice.unshift(directory))
+      path = cifs_normalize(path) if ENV['CIFS_MUSIC_LIBRARY']
       /(?<tracknum>\d\d) (?<title>.*)\.mp3/ =~ track
       Song.find_by_path(path) || add_details(path,artist,title,tracknum,album)
     end
