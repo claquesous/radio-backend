@@ -4,7 +4,7 @@ require 'json'
 class StreamEventPublisher
   class << self
     def publish(event_type, stream)
-      return unless Rails.env.production? && ENV['ENABLE_STREAM_EVENTS']
+      return unless ENV['ENABLE_STREAM_EVENTS']
 
       message = {
         event_type: event_type.to_s,
