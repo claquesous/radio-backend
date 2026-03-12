@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_19_060002) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_11_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -125,10 +125,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_19_060002) do
     t.string "mastodon_url"
     t.float "default_rating", default: 50.0, null: false
     t.boolean "default_featured", default: false, null: false
-    t.boolean "premium"
+    t.boolean "premium", default: false, null: false
     t.string "genre"
     t.text "description"
-    t.boolean "enabled"
+    t.boolean "enabled", default: false, null: false
     t.index ["encrypted_mastodon_access_token_iv"], name: "index_streams_on_encrypted_mastodon_access_token_iv", unique: true
   end
 
