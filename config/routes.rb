@@ -12,6 +12,7 @@ Rails.application.routes.draw do
         member do
           get :available_songs
           get :new_songs
+          post :random_songs
         end
         resources :songs, only: :show, module: :streams
         resources :artists, only: :show, module: :streams
