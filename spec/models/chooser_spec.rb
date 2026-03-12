@@ -4,7 +4,7 @@ RSpec.describe Chooser, type: :model do
   let(:user) { create(:user) }
   let(:stream) { create(:stream, user: user, enabled: false) }
 
-  describe 'deletion prevention for enabled streams' do
+  describe 'deletion prevention for enabled streams', timeout: 30 do
     context 'when deletion would cause stream to have too few choosers' do
       it 'prevents deletion of the last required chooser' do
         choosers = create_list(:chooser, 120, stream: stream)

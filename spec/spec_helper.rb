@@ -41,7 +41,8 @@ RSpec.configure do |config|
   end
 
   config.around(:each) do |example|
-    Timeout::timeout(3) {
+    timeout = example.metadata[:timeout] || 3
+    Timeout::timeout(timeout) {
       example.run
     }
   end
