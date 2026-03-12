@@ -57,6 +57,25 @@ class StreamsController < ApplicationController
     render 'songs/index'
   end
 
+  # POST /streams/1/random_songs.json
+  def random_songs
+    authorize @stream, :update?
+
+    count = [[params[:count].to_i, 1].max, 500].min
+    chosen_song_ids = @stream.choosers.pluck(:song_id)
+    available = Song.where.not(id: chosen_song_ids).order(Arel.sql('RANDOM()')).limit(count)
+
+    rating = @stream.default_rating || 50
+    added = 0
+
+    available.each do |song|
+      chooser = @stream.choosers.build(song: song, rating: rating)
+      added += 1 if chooser.save
+    end
+
+    render json: { added: added, total: @stream.choosers.count }
+  end
+
   # GET /streams/1/new_songs.json
   def new_songs
     limit = (params[:limit] || 25).to_i

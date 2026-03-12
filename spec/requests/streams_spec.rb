@@ -96,6 +96,75 @@ RSpec.describe "/streams", type: :request do
     end
   end
 
+  describe "POST /random_songs" do
+    context "as owner", :as_logged_in_user do
+      before do
+        @stream = create(:stream, user: @logged_in_user, default_rating: 42)
+        @songs = create_list(:song, 10)
+      end
+
+      it "adds random songs to the stream" do
+        expect {
+          post random_songs_stream_path(@stream), params: { count: 5 }
+        }.to change { @stream.choosers.count }.by(5)
+
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json["added"]).to eq(5)
+        expect(json["total"]).to eq(5)
+      end
+
+      it "uses the stream default_rating for new choosers" do
+        post random_songs_stream_path(@stream), params: { count: 3 }
+        expect(@stream.choosers.pluck(:rating)).to all(eq(42))
+      end
+
+      it "does not add songs already in the stream" do
+        create(:chooser, stream: @stream, song: @songs.first)
+
+        post random_songs_stream_path(@stream), params: { count: 100 }
+
+        json = response.parsed_body
+        expect(json["added"]).to eq(9)
+        expect(json["total"]).to eq(10)
+      end
+
+      it "caps count at 500" do
+        post random_songs_stream_path(@stream), params: { count: 1000 }
+
+        json = response.parsed_body
+        # Only 10 songs exist, so at most 10 can be added
+        expect(json["added"]).to eq(10)
+      end
+
+      it "treats count less than 1 as 1" do
+        post random_songs_stream_path(@stream), params: { count: 0 }
+
+        json = response.parsed_body
+        expect(json["added"]).to eq(1)
+      end
+    end
+
+    context "as non-owner", :as_logged_in_user do
+      it "returns unauthorized" do
+        other_user = create(:user)
+        stream = create(:stream, user: other_user)
+
+        post random_songs_stream_path(stream), params: { count: 5 }
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "unauthenticated" do
+      it "returns unauthorized" do
+        stream = create(:stream)
+
+        post random_songs_stream_path(stream), params: { count: 5 }
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe "DELETE /destroy" do
     it "destroys the requested stream", :as_logged_in_user do
       stream = create(:stream, user: @logged_in_user)
