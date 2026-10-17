@@ -4,7 +4,7 @@ require 'json'
 class StreamEventPublisher
   class << self
     def publish(event_type, stream)
-      return unless ENV['ENABLE_STREAM_EVENTS']
+      return unless enabled?
 
       message = {
         event_type: event_type.to_s,
@@ -23,6 +23,13 @@ class StreamEventPublisher
     rescue => e
       Rails.logger.error "Failed to publish stream event: #{e.message}"
       raise unless Rails.env.production?
+    end
+
+    # Never in tests: the compose backend container sets ENABLE_STREAM_EVENTS, so
+    # specs run there would otherwise send events for throwaway test streams to the
+    # real queue, and the stream manager would spawn ices for each of them.
+    def enabled?
+      ENV['ENABLE_STREAM_EVENTS'].present? && !Rails.env.test?
     end
 
     private
