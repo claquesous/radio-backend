@@ -1,4 +1,7 @@
 class StreamsController < ApplicationController
+  include SimilarSongs
+  MAX_SEEDS = 20
+
   skip_before_action :authenticate_request, only: [:index, :show]
 
   before_action :set_stream, except: %i[ index create ]
@@ -55,6 +58,19 @@ class StreamsController < ApplicationController
     @pagination = { total: base.count }
 
     render 'songs/index'
+  end
+
+  # POST /streams/1/recommendations.json { seed_ids: [1, 2], exclude_ids: [3] }
+  # Songs not yet in the stream that suit all the seeds, for building the playlist.
+  # exclude_ids lets a client page through fresh suggestions ("more"). It grows with
+  # every page shown, which is why this is a POST: as a query string it outgrows
+  # Puma's 10KB limit after a few dozen pages.
+  def recommendations
+    authorize @stream, :update?
+
+    @seeds = Song.unscoped.where(id: Array(params[:seed_ids]).first(MAX_SEEDS)).includes(:song_feature)
+    @results = Recommender.similar(@seeds.to_a, **similar_options(default_limit: 8),
+                                   excluding_stream: @stream, exclude_ids: Array(params[:exclude_ids]).map(&:to_i))
   end
 
   # POST /streams/1/random_songs.json

@@ -1,9 +1,10 @@
 class SongsController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index, :show]
+  skip_before_action :authenticate_request, only: [:index, :show, :similar, :credits]
 
   include Mp3Attrs
+  include SimilarSongs
 
-  before_action :set_song, only: [:show, :update]
+  before_action :set_song, only: [:show, :update, :similar, :credits]
 
   # GET /songs.json
   def index
@@ -30,6 +31,16 @@ class SongsController < ApplicationController
   # GET /songs/1.json
   def show
     render :show
+  end
+
+  # GET /songs/1/similar.json?sound=1&creators=0.5&genre_era=1
+  def similar
+    render_similar(@song)
+  end
+
+  # GET /songs/1/credits.json
+  def credits
+    @credits = @song.credits.eager_load(:person).order(:role, "people.name")
   end
 
   # POST /songs.json

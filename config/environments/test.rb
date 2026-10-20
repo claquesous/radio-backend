@@ -63,4 +63,7 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   ENV['MASTODON_ACCESS_TOKEN_KEY'] = 'dummy_key_which_is_32_bytes_stop'
+
+  # Never run jobs (e.g. AnalyzeSongJob calling radio-analyzer) during specs.
+  config.active_job.queue_adapter = :test
 end
