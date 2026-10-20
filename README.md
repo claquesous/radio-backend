@@ -45,6 +45,28 @@ If your music library is mounted via CIFS/SMB (e.g. a Windows share), set `CIFS_
 CIFS_MUSIC_LIBRARY=1 RAILS_ENV=development rake radio:ingest
 ```
 
+### Song analysis for recommendations
+
+Similar-song recommendations (`app/services/recommender.rb`) need per-song features: a sound embedding, a genre embedding, credits, release year and key/mode/BPM. These come from `radio-analyzer`, a stateless HTTP service with no database. Set `ANALYZER_URL` to point at it. When it is unset, song analysis is skipped.
+
+The backend owns all of this data. `SongAnalysis` (`app/services/song_analysis.rb`) works out which steps a song still needs (from its status columns and the model versions reported by the analyzer's `GET /versions`), sends the song's path, tags and known IDs through `AnalyzerClient`, and stores the results in `song_features`, `song_tags`, `credits` and `people`. The steps that need the whole library also run here: `CreatorEmbeddings.rebuild!` (role-weighted TF-IDF over credits) and `FacetCalibration.recalibrate!`.
+
+The analyzer reads the audio files itself, so it must see each song at the same path the backend stores, under its `MUSIC_ROOT`. See the `radio-analyzer` README for running it. With it running, analyze the library with:
+
+```
+rake recommendations:analyze LIMIT=50   # try a slice first
+rake recommendations:analyze            # every pending song
+rake recommendations:analyze RETRY=1    # also retry failures and misses
+rake recommendations:analyze SONG=123   # force one song (or SONG=1,2,3)
+rake recommendations:refresh            # only rebuild creator embeddings and calibrations
+```
+
+`recommendations:analyze` sends `THREADS` (default 4) concurrent requests and finishes by running `recommendations:refresh`.
+
+Songs are also queued for analysis as an `AnalyzeSongJob` when they are created through `POST /api/songs` and whenever a song's MusicBrainz recording match changes. `rake radio:ingest` does not queue them, so run `recommendations:analyze` after a bulk import.
+
+Nothing depends on the analyzer being up. If it is unreachable, times out or returns a 502/503/504, `AnalyzerClient` raises `Unavailable`, the job is discarded and the song waits for the next rake run. Until at least one song has been analyzed, the Similar tab is hidden in the playlist builder.
+
 # Running the app
 
 This is a rails app so you should deploy and run it however you typically do. An example command for running in production could be the following:

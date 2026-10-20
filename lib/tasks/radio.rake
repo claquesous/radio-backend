@@ -45,20 +45,23 @@ namespace :radio do
   task ingest: :environment do
     directory = ENV['INGEST_DIRECTORY']
     abort "Please set INGEST_DIRECTORY environment variable" unless directory
-    f = File.open File.join(directory, "all.m3u")
-    f.readlines.each do |path|
-      slice = path.strip.split(/[\\\/]/).slice(-3,3)
-      artist,album,track = slice
-      path = File.join(slice.unshift(directory))
-      path = cifs_normalize(path) if ENV['CIFS_MUSIC_LIBRARY']
-      /(?<tracknum>\d\d) (?<title>.*)\.mp3/ =~ track
-      Song.find_by_path(path) || add_details(path,artist,title,tracknum,album)
-    end
-    Dir.glob("#{directory}/Promo/**/*.mp3").each do |path|
-      mp3_info = Mp3Info.open(path)
-      artist = mp3_info.tag.artist
-      title = mp3_info.tag.title
-      Song.find_by_path(path) || add_details(path,artist,title)
+    # New songs are analyzed afterwards in bulk: rake recommendations:analyze
+    Song.without_analysis do
+      f = File.open File.join(directory, "all.m3u")
+      f.readlines.each do |path|
+        slice = path.strip.split(/[\\\/]/).slice(-3,3)
+        artist,album,track = slice
+        path = File.join(slice.unshift(directory))
+        path = cifs_normalize(path) if ENV['CIFS_MUSIC_LIBRARY']
+        /(?<tracknum>\d\d) (?<title>.*)\.mp3/ =~ track
+        Song.find_by_path(path) || add_details(path,artist,title,tracknum,album)
+      end
+      Dir.glob("#{directory}/Promo/**/*.mp3").each do |path|
+        mp3_info = Mp3Info.open(path)
+        artist = mp3_info.tag.artist
+        title = mp3_info.tag.title
+        Song.find_by_path(path) || add_details(path,artist,title)
+      end
     end
   end
 

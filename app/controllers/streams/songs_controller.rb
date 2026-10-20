@@ -1,6 +1,7 @@
 module Streams
   class SongsController < ApplicationController
     skip_before_action :authenticate_request
+    include SimilarSongs
 
     # GET /streams/1/songs/1.json
     def show
@@ -15,6 +16,10 @@ module Streams
       @rank = @song.stream_rank(stream)
       @last_week_rank = @song.stream_rank(stream, 1.week.ago)
     end
+
+    # GET /streams/1/songs/1/similar.json, limited to the stream's chooser set
+    def similar
+      render_similar(Song.find(params[:id]), stream: Stream.find(params[:stream_id]))
+    end
   end
 end
-

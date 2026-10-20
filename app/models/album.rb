@@ -1,5 +1,8 @@
 class Album < ApplicationRecord
   include Rankable
+  include MusicbrainzLinked
+
+  musicbrainz_id_column :mb_release_group_id
 
   belongs_to :artist
   has_many :songs, dependent: :restrict_with_error

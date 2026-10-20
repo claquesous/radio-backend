@@ -79,5 +79,43 @@ FactoryBot.define do
     rating { 50 }
   end
 
-end
+  factory :song_feature do
+    song
+    transient do
+      sound { nil }    # e.g. { 0 => 1.0, 1 => 0.2 }, see SpecVectors.vec
+      creators { nil }  # e.g. { 7 => 1.0 }: person id => weight
+      genre { nil }
+    end
+    sound_embedding { sound && SpecVectors.vec(1280, sound) }
+    creator_embedding { creators && SpecVectors.sparse(creators) }
+    genre_embedding { genre && SpecVectors.vec(384, genre) }
+  end
 
+  factory :facet_calibration do
+    facet { "sound" }
+    p50 { 0.0 }
+    p90 { 0.5 }
+    p99 { 0.9 }
+    p999 { 1.0 }
+    sample_pairs { 100 }
+  end
+
+  factory :person do
+    sequence(:name) { |n| "Person #{n}" }
+  end
+
+  factory :credit do
+    song
+    person
+    role { "producer" }
+    source { "musicbrainz" }
+  end
+
+  factory :song_tag do
+    song
+    tag { "post-punk" }
+    weight { 1.0 }
+    source { "musicbrainz" }
+  end
+
+end
