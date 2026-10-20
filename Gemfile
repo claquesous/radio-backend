@@ -1,11 +1,11 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.4.1'
+ruby '~> 3.4.1'
 
 gem 'rails', '~> 8.0.2'
 gem 'pg'
-gem 'puma', '~> 6.0'
+gem 'puma', '~> 7.2'
 
 gem 'jbuilder', '~> 2.7'
 
@@ -34,3 +34,5 @@ gem 'pundit'
 gem 'jwt'
 gem 'attr_encrypted', '~> 4.1.0'
 gem 'neighbor'
+# json 3 drops the quirks_mode option that Rails 8.0's ActiveSupport::JSON still passes.
+gem 'json', '~> 2.19', '>= 2.19.9'
