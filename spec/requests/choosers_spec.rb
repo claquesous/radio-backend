@@ -53,6 +53,32 @@ RSpec.describe "/choosers", type: :request do
     end
   end
 
+  describe "POST /streams/:stream_id/choosers/batch" do
+    context "as owner", :as_logged_in_user do
+      before { @stream = create(:stream, user: @logged_in_user, default_rating: 42) }
+
+      it "adds the songs not already in the stream at the default rating" do
+        create(:chooser, stream: @stream, song: song)
+        post batch_stream_choosers_path(@stream), params: { song_ids: [song.id, other_song.id] }, as: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq("added" => [other_song.id], "total" => 2)
+        expect(@stream.choosers.find_by(song: other_song).rating).to eq(42)
+      end
+    end
+
+    context "as non-owner" do
+      before do
+        @stream = create(:stream, user: user)
+        allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(other_user)
+      end
+
+      it "returns unauthorized" do
+        post batch_stream_choosers_path(@stream), params: { song_ids: [song.id] }, as: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe "PATCH /streams/:stream_id/choosers/:id" do
     context "as owner", :as_logged_in_user do
       before do
