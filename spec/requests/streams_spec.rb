@@ -45,6 +45,25 @@ RSpec.describe "/streams", type: :request do
       expect(json).to have_key("default_rating")
     end
 
+    it "reports playlist progress toward enabling to the owner", :as_logged_in_user do
+      stream = create(:stream, user: @logged_in_user)
+      artist = create(:artist)
+      create_list(:song, 2, artist:).each { |song| create(:chooser, stream:, song:) }
+      create(:chooser, stream:)
+      get stream_url(stream)
+      expect(response.parsed_body["playlist"]).to eq(
+        "songs" => 3, "artists" => 2, "required_songs" => 120, "required_artists" => 60,
+        "similar_songs_available" => false
+      )
+
+      create(:song_feature, sound: { 0 => 1.0 })
+      get stream_url(stream)
+      expect(response.parsed_body["playlist"]["similar_songs_available"]).to be(true)
+
+      get stream_url(create(:stream))
+      expect(response.parsed_body).not_to have_key("playlist")
+    end
+
     it "does not render fields private to the owner of the stream as non-owner", :as_logged_in_user do
       stream = create(:stream)
       get stream_url(stream)
@@ -99,49 +118,66 @@ RSpec.describe "/streams", type: :request do
   describe "POST /random_songs" do
     context "as owner", :as_logged_in_user do
       before do
-        @stream = create(:stream, user: @logged_in_user, default_rating: 42)
+        @stream = create(:stream, user: @logged_in_user)
         @songs = create_list(:song, 10)
       end
 
-      it "adds random songs to the stream" do
+      it "suggests random songs without adding them" do
         expect {
-          post random_songs_stream_path(@stream), params: { count: 5 }
-        }.to change { @stream.choosers.count }.by(5)
+          post random_songs_stream_path(@stream), params: { limit: 5 }, as: :json
+        }.not_to change { @stream.choosers.count }
 
         expect(response).to have_http_status(:ok)
-        json = response.parsed_body
-        expect(json["added"]).to eq(5)
-        expect(json["total"]).to eq(5)
+        results = response.parsed_body["results"]
+        expect(results.size).to eq(5)
+        expect(results.first.keys).to include("id", "title", "year", "artist", "album")
       end
 
-      it "uses the stream default_rating for new choosers" do
-        post random_songs_stream_path(@stream), params: { count: 3 }
-        expect(@stream.choosers.pluck(:rating)).to all(eq(42))
-      end
-
-      it "does not add songs already in the stream" do
+      it "skips songs already in the stream or excluded" do
         create(:chooser, stream: @stream, song: @songs.first)
 
-        post random_songs_stream_path(@stream), params: { count: 100 }
+        post random_songs_stream_path(@stream), params: { limit: 100, exclude_ids: [@songs.second.id] }, as: :json
 
-        json = response.parsed_body
-        expect(json["added"]).to eq(9)
-        expect(json["total"]).to eq(10)
+        ids = response.parsed_body["results"].map { |r| r["id"] }
+        expect(ids).to match_array(@songs.drop(2).map(&:id))
       end
 
-      it "caps count at 500" do
-        post random_songs_stream_path(@stream), params: { count: 1000 }
+      it "suggests at most one song per artist" do
+        artist = @songs.first.artist
+        create_list(:song, 3, artist:)
 
-        json = response.parsed_body
-        # Only 10 songs exist, so at most 10 can be added
-        expect(json["added"]).to eq(10)
+        post random_songs_stream_path(@stream), params: { limit: 100 }, as: :json
+
+        artist_ids = response.parsed_body["results"].map { |r| r["artist"]["id"] }
+        expect(artist_ids).to eq(artist_ids.uniq)
+        expect(artist_ids.size).to eq(10)
       end
 
-      it "treats count less than 1 as 1" do
-        post random_songs_stream_path(@stream), params: { count: 0 }
+      context "with count, as the pre-picker frontend sends" do
+        before { @stream.update!(default_rating: 42) }
 
-        json = response.parsed_body
-        expect(json["added"]).to eq(1)
+        it "adds that many random songs at the default rating" do
+          expect {
+            post random_songs_stream_path(@stream), params: { count: 5 }, as: :json
+          }.to change { @stream.choosers.count }.by(5)
+
+          expect(response.parsed_body).to eq("added" => 5, "total" => 5)
+          expect(@stream.choosers.pluck(:rating)).to all(eq(42))
+        end
+
+        it "skips songs already in the stream" do
+          create(:chooser, stream: @stream, song: @songs.first)
+
+          post random_songs_stream_path(@stream), params: { count: 100 }, as: :json
+
+          expect(response.parsed_body).to eq("added" => 9, "total" => 10)
+        end
+
+        it "adds at least one song" do
+          post random_songs_stream_path(@stream), params: { count: 0 }, as: :json
+
+          expect(response.parsed_body["added"]).to eq(1)
+        end
       end
     end
 
@@ -150,7 +186,7 @@ RSpec.describe "/streams", type: :request do
         other_user = create(:user)
         stream = create(:stream, user: other_user)
 
-        post random_songs_stream_path(stream), params: { count: 5 }
+        post random_songs_stream_path(stream), params: { limit: 5 }
         expect(response).to have_http_status(:unauthorized)
       end
     end
@@ -159,9 +195,45 @@ RSpec.describe "/streams", type: :request do
       it "returns unauthorized" do
         stream = create(:stream)
 
-        post random_songs_stream_path(stream), params: { count: 5 }
+        post random_songs_stream_path(stream), params: { limit: 5 }
         expect(response).to have_http_status(:unauthorized)
       end
+    end
+  end
+
+  describe "GET /available_songs", :as_logged_in_user do
+    let(:stream) { create(:stream, user: @logged_in_user) }
+    let(:beatles) { create(:artist, name: "The Beatles") }
+    let!(:help) { create(:song, artist: beatles, title: "Help!") }
+    let!(:yesterday) { create(:song, artist: beatles, title: "Yesterday", album: create(:album, title: "Help!")) }
+    let!(:other) { create(:song, title: "Help Me Rhonda") }
+
+    def ids = response.parsed_body["songs"].map { |s| s["id"] }
+
+    it "matches every word against title, artist or album" do
+      get available_songs_stream_path(stream), params: { query: "help" }
+      expect(ids).to contain_exactly(help.id, yesterday.id, other.id)
+
+      get available_songs_stream_path(stream), params: { query: "beatles help" }
+      expect(ids).to contain_exactly(help.id, yesterday.id)
+      expect(response.parsed_body["total"]).to eq(2)
+    end
+
+    it "treats LIKE wildcards literally" do
+      get available_songs_stream_path(stream), params: { query: "%" }
+      expect(ids).to eq([])
+    end
+
+    it "leaves out songs already in the stream" do
+      create(:chooser, stream:, song: help)
+      get available_songs_stream_path(stream), params: { query: "help" }
+      expect(ids).to contain_exactly(yesterday.id, other.id)
+    end
+
+    it "lists the newest songs first with sort=newest" do
+      help.update!(created_at: 1.day.from_now)
+      get available_songs_stream_path(stream), params: { sort: "newest" }
+      expect(ids.first).to eq(help.id)
     end
   end
 

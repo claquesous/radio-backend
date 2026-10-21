@@ -41,6 +41,13 @@ class Recommender
 
   Result = Struct.new(:song, :score, :scores, :details, keyword_init: true)
 
+  # Whether any song has been analyzed enough to be compared. Without radio-analyzer
+  # nothing ever is, and clients should hide similar-song features.
+  def self.available?
+    SongFeature.where.not(sound_embedding: nil).or(SongFeature.where.not(creator_embedding: nil))
+      .or(SongFeature.where.not(genre_embedding: nil)).exists?
+  end
+
   # seeds: a Song or an array of Songs.
   # stream: only recommend songs in this stream's chooser set.
   # excluding_stream: only recommend songs not yet in this stream's chooser set.

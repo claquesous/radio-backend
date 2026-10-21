@@ -1,4 +1,6 @@
 class ChoosersController < ApplicationController
+  MAX_BATCH = 500
+
   before_action :set_stream
   before_action :authorize_stream, except: [:index]
 
@@ -50,6 +52,18 @@ class ChoosersController < ApplicationController
     else
       render json: @chooser.errors, status: :unprocessable_entity
     end
+  end
+
+  # POST /choosers/batch.json { song_ids: [1, 2] }
+  # Adds several songs at the stream's default rating, skipping any already in it.
+  def batch
+    song_ids = Song.unscoped.where(id: Array(params[:song_ids]).first(MAX_BATCH))
+      .where.not(id: @stream.choosers.unscope(:order).select(:song_id)).pluck(:id)
+    rating = @stream.default_rating || 50
+    added = Chooser.transaction do
+      song_ids.select { |song_id| @stream.choosers.create(song_id:, rating:).persisted? }
+    end
+    render json: { added:, total: @stream.choosers.count }
   end
 
   # DELETE /choosers/1.json

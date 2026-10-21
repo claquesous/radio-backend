@@ -52,6 +52,14 @@ RSpec.describe "similar songs and credits", type: :request do
   describe "POST /streams/:id/recommendations" do
     let!(:other) { create(:song_feature, sound: { 0 => 1.0, 1 => 0.4 }).song }
 
+    it "seeds from the stream's own songs when no seed_ids are given", :as_logged_in_user do
+      stream = create(:stream, user: @logged_in_user)
+      create(:chooser, stream:, song: seed)
+      post recommendations_stream_url(stream), params: { sound: 1 }, as: :json
+      expect(response.parsed_body["seeds"]).to eq([{ "id" => seed.id, "title" => seed.title }])
+      expect(response.parsed_body["results"].map { |r| r["id"] }).to eq([match.id, other.id])
+    end
+
     it "recommends songs not yet in the stream, skipping excluded ids", :as_logged_in_user do
       stream = create(:stream, user: @logged_in_user)
       create(:chooser, stream:, song: seed)
