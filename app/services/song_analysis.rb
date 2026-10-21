@@ -12,6 +12,7 @@
 class SongAnalysis
   RETRY_IDENTIFY = %w[unmatched error missing_file].freeze
   FAILED = "failed".freeze
+  URL_EXPIRY = 15.minutes.to_i
   FEATURES = %w[bpm bpm_confidence key mode key_strength loudness danceability styles sound_embedding].freeze
 
   # Songs with any step outstanding.
@@ -54,6 +55,19 @@ class SongAnalysis
     @client.versions
   end
 
+  # Where the analyzer reads the song from: its path, when the analyzer mounts the
+  # library too, or with ANALYZER_AUDIO=s3 a presigned GET for its object in
+  # AWS_S3_BUCKET, when it can't (on Lambda). The library is that bucket mounted at
+  # SONGS_DIRECTORY (s3fs), so the key is the path below it. Each call presigns
+  # afresh, since a URL can expire while the song waits for the analyzer.
+  def audio
+    return { path: @song.path } unless ENV["ANALYZER_AUDIO"] == "s3"
+
+    key = @song.path.delete_prefix("#{SONGS_DIRECTORY}/")
+    presigner = Aws::S3::Presigner.new(client: Aws::S3::Client.new(region: ENV["AWS_REGION"]))
+    { url: presigner.presigned_url(:get_object, bucket: ENV.fetch("AWS_S3_BUCKET"), key:, expires_in: URL_EXPIRY) }
+  end
+
   # Embedded with an older model. (A song with no embedding has no tags to embed.)
   def genre_stale?
     @feature.genre_model_version.present? && @feature.genre_model_version != versions["genre"]
@@ -82,7 +96,7 @@ class SongAnalysis
     if @song.musicbrainz_metadata.present? && @song.mb_recording_id
       status = "manual"
     else
-      result = @client.identify(path: @song.path, title: @song.title, artist: @song.artist.name,
+      result = @client.identify(**audio, title: @song.title, artist: @song.artist.name,
                                 album: @song.album&.title, duration: @song.time)
       status = result["status"]
       unless %w[error missing_file].include?(status)
@@ -95,7 +109,7 @@ class SongAnalysis
 
   # Returns whether the song's tags changed.
   def analyze
-    result = @client.analyze(path: @song.path)
+    result = @client.analyze(**audio)
     SongFeature.transaction do
       @feature.update!(**result.slice(*FEATURES), sound_model_version: result["model_version"],
                        analyzed_at: Time.current)

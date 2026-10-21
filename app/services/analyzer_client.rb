@@ -25,8 +25,9 @@ class AnalyzerClient
     Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH, Errno::ENETUNREACH,
     Errno::ETIMEDOUT, Errno::EADDRNOTAVAIL, SocketError, Net::OpenTimeout, Net::ReadTimeout, EOFError
   ].freeze
-  # What a proxy or load balancer answers when the service behind it is down.
-  UNAVAILABLE_STATUSES = [502, 503, 504].freeze
+  # What a proxy or load balancer answers when the service behind it is down, and
+  # what Lambda answers (429) while its one reserved instance is busy.
+  UNAVAILABLE_STATUSES = [429, 502, 503, 504].freeze
 
   OPEN_TIMEOUT = 5
   # Requests queue behind the metadata APIs' rate limits and the Essentia pool.
@@ -36,20 +37,24 @@ class AnalyzerClient
     ENV["ANALYZER_URL"].present?
   end
 
-  def initialize(base_url = ENV.fetch("ANALYZER_URL"))
+  # token: sent as a bearer token, for an analyzer started with ANALYZER_TOKEN.
+  def initialize(base_url = ENV.fetch("ANALYZER_URL"), token: ENV["ANALYZER_TOKEN"].presence)
     @base_url = base_url
+    @token = token
   end
 
+  # audio is path: (a file the analyzer can read) or url: (one it downloads).
   # => { "status", "mb_recording_id", "acoustid" }
-  def identify(path:, title:, artist:, album: nil, duration: nil)
-    post("/identify", { path:, title:, artist:, album:, duration: })
+  def identify(title:, artist:, album: nil, duration: nil, **audio)
+    post("/identify", { **audio, title:, artist:, album:, duration: })
   end
 
   # => audio features, "styles", "style_tags", "sound_embedding", "model_version"
-  def analyze(path:)
-    post("/analyze", { path: })
+  def analyze(**audio)
+    post("/analyze", audio)
   rescue HTTPError => e
-    raise MissingFile, path if e.status == 404
+    # Not the URL: a presigned one carries its signature.
+    raise MissingFile, audio[:path] || "song url" if e.status == 404
     raise AnalysisFailed, e.message if e.status == 422
     raise
   end
@@ -78,6 +83,7 @@ class AnalyzerClient
   end
 
   def request(req)
+    req["Authorization"] = "Bearer #{@token}" if @token
     u = req.uri
     response = Net::HTTP.start(u.host, u.port, use_ssl: u.scheme == "https",
                                                open_timeout: OPEN_TIMEOUT, read_timeout: READ_TIMEOUT) do |http|

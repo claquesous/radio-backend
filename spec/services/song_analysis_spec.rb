@@ -51,6 +51,32 @@ RSpec.describe SongAnalysis do
     expect(song.artist.reload.mb_artist_id).to eq(artist_mbid)
   end
 
+  context "with ANALYZER_AUDIO=s3" do
+    before do
+      stub_const("SONGS_DIRECTORY", "/music")
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("ANALYZER_AUDIO").and_return("s3")
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with("AWS_S3_BUCKET").and_return("claqradio-music")
+      s3 = Aws::S3::Client.new(stub_responses: true, region: "us-east-1")
+      allow(Aws::S3::Client).to receive(:new).and_return(s3)
+      song.update!(path: "/music/joy-division/substance/atmosphere")
+    end
+
+    it "sends presigned S3 URLs for the song's object instead of its path" do
+      run
+
+      expect(client).to have_received(:identify).with(hash_including(url: anything)) do |**args|
+        expect(args).not_to include(:path)
+        url = URI(args[:url])
+        expect(url.host).to start_with("claqradio-music.")
+        expect(url.path).to eq("/joy-division/substance/atmosphere")
+        expect(url.query).to include("X-Amz-Signature=")
+      end
+      expect(client).to have_received(:analyze).with(url: a_string_including("/joy-division/substance/atmosphere?"))
+    end
+  end
+
   it "skips steps that are already done" do
     run
     run

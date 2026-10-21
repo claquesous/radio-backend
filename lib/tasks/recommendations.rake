@@ -1,6 +1,7 @@
 namespace :recommendations do
   desc "Run pending songs through radio-analyzer, then refresh creator embeddings and calibrations. " \
-       "SONG=1,2 (force those), LIMIT=n, RETRY=1 (retry failures and misses), THREADS=4"
+       "SONG=1,2 (force those), LIMIT=n, RETRY=1 (retry failures and misses), " \
+       "THREADS=n (default ANALYZER_CONCURRENCY, or 4)"
   task analyze: :environment do
     client = AnalyzerClient.new
     retry_failed = ENV["RETRY"].present?
@@ -15,12 +16,14 @@ namespace :recommendations do
     puts "analyzing #{songs.size} songs"
 
     # Concurrent requests keep the analyzer's Essentia pool busy; it serializes
-    # the rate-limited metadata lookups itself.
+    # the rate-limited metadata lookups itself. An analyzer that takes one request
+    # at a time (on Lambda) answers any more with a 429, which aborts the run, so it
+    # sets ANALYZER_CONCURRENCY=1.
     queue = Queue.new
     songs.each { |song| queue << song }
     done = Concurrent::AtomicFixnum.new
     failed = Concurrent::AtomicFixnum.new
-    threads = Array.new(ENV.fetch("THREADS", 4).to_i) do
+    threads = Array.new(ENV.fetch("THREADS") { ENV.fetch("ANALYZER_CONCURRENCY", 4) }.to_i) do
       Thread.new do
         while (song = queue.pop(true) rescue nil)
           Rails.application.executor.wrap do

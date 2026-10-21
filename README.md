@@ -47,11 +47,11 @@ CIFS_MUSIC_LIBRARY=1 RAILS_ENV=development rake radio:ingest
 
 ### Song analysis for recommendations
 
-Similar-song recommendations (`app/services/recommender.rb`) need per-song features: a sound embedding, a genre embedding, credits, release year and key/mode/BPM. These come from `radio-analyzer`, a stateless HTTP service with no database. Set `ANALYZER_URL` to point at it. When it is unset, song analysis is skipped.
+Similar-song recommendations (`app/services/recommender.rb`) need per-song features: a sound embedding, a genre embedding, credits, release year and key/mode/BPM. These come from `radio-analyzer`, a stateless HTTP service with no database. Set `ANALYZER_URL` to point at it, and `ANALYZER_TOKEN` if it requires a bearer token. When `ANALYZER_URL` is unset, song analysis is skipped.
 
 The backend owns all of this data. `SongAnalysis` (`app/services/song_analysis.rb`) works out which steps a song still needs (from its status columns and the model versions reported by the analyzer's `GET /versions`), sends the song's path, tags and known IDs through `AnalyzerClient`, and stores the results in `song_features`, `song_tags`, `credits` and `people`. The steps that need the whole library also run here: `CreatorEmbeddings.rebuild!` (role-weighted TF-IDF over credits) and `FacetCalibration.recalibrate!`.
 
-The analyzer reads the audio files itself, so it must see each song at the same path the backend stores, under its `MUSIC_ROOT`. See the `radio-analyzer` README for running it. With it running, analyze the library with:
+The analyzer needs each song's audio. By default it gets the song's path, so it must see the library at the same path the backend stores, under its `MUSIC_ROOT`. An analyzer that can't see the library (on Lambda) gets a presigned S3 GET URL instead when `ANALYZER_AUDIO=s3`: the library is then the `AWS_S3_BUCKET` bucket mounted at `SONGS_DIRECTORY`, and each song's key is its path below that. See the `radio-analyzer` README for running it. With it running, analyze the library with:
 
 ```
 rake recommendations:analyze LIMIT=50   # try a slice first
@@ -61,7 +61,7 @@ rake recommendations:analyze SONG=123   # force one song (or SONG=1,2,3)
 rake recommendations:refresh            # only rebuild creator embeddings and calibrations
 ```
 
-`recommendations:analyze` sends `THREADS` (default 4) concurrent requests and finishes by running `recommendations:refresh`.
+`recommendations:analyze` sends `THREADS` concurrent requests (default `ANALYZER_CONCURRENCY`, or 4) and finishes by running `recommendations:refresh`. Set `ANALYZER_CONCURRENCY=1` for an analyzer that takes one request at a time, like the Lambda deployment: it answers any more with a 429, which aborts the run.
 
 Songs are also queued for analysis as an `AnalyzeSongJob` when they are created through `POST /api/songs` and whenever a song's MusicBrainz recording match changes. `rake radio:ingest` does not queue them, so run `recommendations:analyze` after a bulk import.
 
