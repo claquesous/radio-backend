@@ -1,5 +1,5 @@
 # ── Stage 1: Build ────────────────────────────────────────────
-FROM ruby:3.4.1-slim AS build
+FROM ruby:3.4.11-slim AS build
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
@@ -21,7 +21,7 @@ COPY . .
 RUN bundle exec bootsnap precompile --gemfile app/ lib/
 
 # ── Stage 2: Runtime ───────────────────────────────────────────
-FROM ruby:3.4.1-slim AS runtime
+FROM ruby:3.4.11-slim AS runtime
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
