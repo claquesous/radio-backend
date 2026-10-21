@@ -38,5 +38,7 @@ Rails.application.routes.draw do
     post "streams/:stream_id/plays", to: "plays#create"
 
     get "auth", to: "auths#show"
+
+    get "streams", to: "streams#enabled", defaults: { format: :json }
   end
 end

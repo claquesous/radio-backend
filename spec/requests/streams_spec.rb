@@ -237,6 +237,23 @@ RSpec.describe "/streams", type: :request do
     end
   end
 
+  describe "GET /private/streams" do
+    it "lists only enabled streams, without authentication" do
+      # A stream can't be created enabled, and enabling one needs a full chooser set.
+      enabled = create(:stream, name: "On air", genre: "Rock")
+      enabled.update_column(:enabled, true)
+      create(:stream, name: "Off air")
+
+      get "/private/streams"
+
+      expect(response).to be_successful
+      expect(response.parsed_body).to eq([
+        { "id" => enabled.id, "name" => "On air", "premium" => enabled.premium,
+          "description" => enabled.description, "genre" => "Rock" }
+      ])
+    end
+  end
+
   describe "DELETE /destroy" do
     it "destroys the requested stream", :as_logged_in_user do
       stream = create(:stream, user: @logged_in_user)

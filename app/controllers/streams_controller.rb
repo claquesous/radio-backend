@@ -3,9 +3,9 @@ class StreamsController < ApplicationController
   MAX_SEEDS = 20
   MAX_RANDOM = 100
 
-  skip_before_action :authenticate_request, only: [:index, :show]
+  skip_before_action :authenticate_request, only: [:index, :show, :enabled]
 
-  before_action :set_stream, except: %i[ index create ]
+  before_action :set_stream, except: %i[ index create enabled ]
   before_action :remove_blank_mastodon_access_token, only: :update
 
   # GET /streams.json
@@ -17,6 +17,16 @@ class StreamsController < ApplicationController
   # GET /streams/1.json
   def show
     render :show
+  end
+
+  # GET /private/streams.json
+  # Called by the stream manager to reconcile which streams should be
+  # running against what's actually enabled in Postgres, so a stream
+  # doesn't stay silently stopped if DynamoDB/SQS state is lost or a
+  # crash-retry budget is exhausted.
+  def enabled
+    @streams = Stream.where(enabled: true)
+    render :enabled
   end
 
   # POST /streams.json
