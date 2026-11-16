@@ -31,6 +31,19 @@ class PlaysController < ApplicationController
     end
   end
 
+  # GET /private/streams/:stream_id/plays/current
+  # Read-only: the play on the air now and how far into its song it is, so an
+  # encoder that restarts mid-song resumes it instead of recording a new Play.
+  def current
+    @play = @stream.current_play
+
+    if @play
+      render :current
+    else
+      head :not_found
+    end
+  end
+
   private
 
     def set_stream
