@@ -36,6 +36,7 @@ Rails.application.routes.draw do
 
   scope :private do
     post "streams/:stream_id/plays", to: "plays#create"
+    get "streams/:stream_id/plays/current", to: "plays#current"
 
     get "auth", to: "auths#show"
 

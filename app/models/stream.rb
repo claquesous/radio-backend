@@ -24,6 +24,18 @@ class Stream < ApplicationRecord
     plays.build(playtime: Time.now, song: pick_requested_song || pick_random_song)
   end
 
+  # The play on the air right now, so an encoder that restarts mid-song can
+  # pick the song back up instead of starting a new one. Nil once the song is
+  # about to end (or its length is unknown): resuming the last few seconds is
+  # not worth it, and cueing past the end of the file is not safe.
+  RESUME_MARGIN = 10 # seconds
+
+  def current_play
+    play = plays.includes(:song).first
+    return nil unless play&.playtime && play.song.time
+    play if play.offset < play.song.time - RESUME_MARGIN
+  end
+
   def by_date(from = nil, to = nil)
     plays = self.plays.unscoped.where(stream: self)
     plays = plays.where('playtime > ?', from) if from

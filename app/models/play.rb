@@ -23,6 +23,11 @@ class Play < ApplicationRecord
     end
   end
 
+  # Seconds since this play started.
+  def offset
+    Time.current - playtime
+  end
+
   def self.by_date(from = nil, to = nil)
     songs = unscoped
     songs = songs.where('playtime > ?', from) if from
